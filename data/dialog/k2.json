@@ -1,0 +1,68 @@
+{
+  "id": "k2",
+  "apply_pendam_bomb": true,
+  "rounds": [
+    {
+      "setup": [
+        {
+          "speaker": "adik",
+          "text": "Kakak tuh selalu diem. Pantes aja nggak ada yang ngerti Kakak."
+        }
+      ],
+      "must_be_honest": false,
+      "choices": [
+        {
+          "type": "jujur",
+          "text": "Iya, aku emang sering diem. Tapi omongan kayak gitu bikin aku makin sakit.",
+          "reply": []
+        },
+        {
+          "type": "pendam",
+          "text": "Nggak apa-apa, aku emang gitu orangnya.",
+          "reply": []
+        },
+        {
+          "type": "sindir",
+          "text": "Wah, kamu tahu banyak ya soal hidup orang.",
+          "reply": []
+        },
+        {
+          "type": "ledak",
+          "text": "Ngaca dulu sebelum ngomong!",
+          "reply": []
+        }
+      ]
+    },
+    {
+      "setup": [
+        {
+          "speaker": "adik",
+          "text": "Terus kenapa Kakak nggak pernah bilang apa-apa?"
+        }
+      ],
+      "must_be_honest": false,
+      "choices": [
+        {
+          "type": "jujur",
+          "text": "Karena aku takut. Aku kira kalau aku diam, semuanya bakal baik-baik aja.",
+          "reply": []
+        },
+        {
+          "type": "pendam",
+          "text": "Udahlah, nggak usah dibahas.",
+          "reply": []
+        },
+        {
+          "type": "sindir",
+          "text": "Emang kalau aku bilang, kamu bakal peduli?",
+          "reply": []
+        },
+        {
+          "type": "ledak",
+          "text": "Karena kamu nggak akan ngerti!",
+          "reply": []
+        }
+      ]
+    }
+  ]
+}

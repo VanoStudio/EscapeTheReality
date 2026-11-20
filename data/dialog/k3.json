@@ -1,0 +1,68 @@
+{
+  "id": "k3",
+  "apply_pendam_bomb": true,
+  "rounds": [
+    {
+      "setup": [
+        {
+          "speaker": "adik",
+          "text": "Kakak masih mikirin soal itu, kan? Semua orang juga tahu kok."
+        }
+      ],
+      "must_be_honest": true,
+      "choices": [
+        {
+          "type": "jujur",
+          "text": "Iya, soal itu. Aku belum siap ngomongin, dan waktu kamu ungkit, rasanya sakit banget.",
+          "reply": []
+        },
+        {
+          "type": "pendam",
+          "text": "Nggak ada apa-apa. Udah, masuk kamar sana.",
+          "reply": []
+        },
+        {
+          "type": "sindir",
+          "text": "Hebat ya, kamu selalu tahu segalanya.",
+          "reply": []
+        },
+        {
+          "type": "ledak",
+          "text": "CUKUP! Itu bukan urusanmu!",
+          "reply": []
+        }
+      ]
+    },
+    {
+      "setup": [
+        {
+          "speaker": "adik",
+          "text": "...Aku cuma pengen Kakak cerita. Kakak nggak pernah cerita apa-apa ke aku."
+        }
+      ],
+      "must_be_honest": true,
+      "choices": [
+        {
+          "type": "jujur",
+          "text": "Maaf aku bentak kamu. Aku juga salah, karena terus nyimpen semuanya sendiri. Nanti aku cerita, ya.",
+          "reply": []
+        },
+        {
+          "type": "pendam",
+          "text": "Ya udah, maaf. Lupain aja.",
+          "reply": []
+        },
+        {
+          "type": "sindir",
+          "text": "Oh, jadi sekarang aku yang salah?",
+          "reply": []
+        },
+        {
+          "type": "ledak",
+          "text": "Kamu nggak berhak minta apa-apa dari aku!",
+          "reply": []
+        }
+      ]
+    }
+  ]
+}

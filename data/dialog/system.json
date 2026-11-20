@@ -1,0 +1,39 @@
+{
+  "shadow_comments": {
+    "jujur": {
+      "speaker": "bayangan",
+      "text": "Rasanya lebih ringan, kan?"
+    },
+    "pendam": {
+      "speaker": "bayangan",
+      "text": "'Gapapa' lagi. Aku yang nyimpen semuanya, lho."
+    },
+    "sindir": {
+      "speaker": "bayangan",
+      "text": "Kedengarannya tenang. Tapi itu pisau."
+    },
+    "ledak": {
+      "speaker": "bayangan",
+      "text": "Lega sebentar. Habis itu?"
+    }
+  },
+  "pendam_bomb": {
+    "speaker": "bayangan",
+    "text": "Inget yang tadi kamu pendam? Aku masih bawa."
+  },
+  "k3_repeat": {
+    "speaker": "bayangan",
+    "text": "Lagi? Kamu mau ngulang malam itu selamanya?"
+  },
+  "closing": {
+    "speaker": "bayangan",
+    "text": "Itu... yang selama ini aku tunggu."
+  },
+  "f4_missing": {
+    "speaker": "bayangan",
+    "text": "Masih ada yang hilang."
+  },
+  "ending_day_one": {
+    "text": "Hari pertama selesai. Masih ada dua hari lagi."
+  }
+}

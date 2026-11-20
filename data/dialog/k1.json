@@ -1,0 +1,62 @@
+{
+  "id": "k1",
+  "apply_pendam_bomb": false,
+  "rounds": [
+    {
+      "setup": [
+        {
+          "speaker": "bayangan",
+          "text": "Kamu nggak bakal kuat jalan jauh kalau belum makan."
+        },
+        {
+          "speaker": "penjual",
+          "portrait": "netral",
+          "text": "Eh, kamu dari tadi di situ? Nggak kelihatan. Kamu kan biasanya diem aja."
+        }
+      ],
+      "must_be_honest": false,
+      "choices": [
+        {
+          "type": "jujur",
+          "text": "Aku udah nunggu dari tadi, dan jujur aku agak kesel nggak dilihat. Boleh aku pesan sekarang?",
+          "reply": [
+            {
+              "speaker": "penjual",
+              "text": "Oh... maaf ya. Ini, bagianmu."
+            }
+          ]
+        },
+        {
+          "type": "pendam",
+          "text": "Oh, nggak apa-apa kok, aku bisa nunggu lagi.",
+          "reply": [
+            {
+              "speaker": "penjual",
+              "text": "Bagus, tunggu ya."
+            }
+          ]
+        },
+        {
+          "type": "sindir",
+          "text": "Iya, santai aja. Aku emang nggak penting kok.",
+          "reply": [
+            {
+              "speaker": "penjual",
+              "text": "Ya ampun, sensi amat."
+            }
+          ]
+        },
+        {
+          "type": "ledak",
+          "text": "Mata kamu di mana sih?! Aku dari tadi berdiri di sini!",
+          "reply": [
+            {
+              "speaker": "penjual",
+              "text": "Penjual kaget, melempar bungkusan, lalu menghilang"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

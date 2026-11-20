@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="Tuning" load_steps=2 format=3 uid="uid://tuning_res_001"]
+
+[ext_resource type="Script" path="res://scripts/tuning.gd" id="1_tuning"]
+
+[resource]
+script = ExtResource("1_tuning")
+stability_initial = 60
+stability_min = 0
+stability_max = 100
+stability_loop_reset = 40
+delta_jujur = 15
+delta_pendam = 5
+delta_sindir = -10
+delta_ledak = -20
+pendam_bomb_multiplier = 12
+tier_tenang_min = 60
+tier_kesel_min = 30
+tier_hampir_meledak_min = 1
+timer_tenang = 0.0
+timer_kesel = 30.0
+timer_hampir_meledak = 15.0
+opacity_jujur_kesel = 0.75
+opacity_jujur_hampir_meledak = 0.55
+tint_kesel_orange_alpha = 0.15
+tint_hampir_meledak_red_alpha = 0.3
+rewind_duration = 1.5
+walk_speed = 80.0
+jump_velocity = -230.0
+gravity = 600.0
+coyote_time = 0.1
+jump_buffer = 0.1
