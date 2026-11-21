@@ -1,6 +1,8 @@
 extends SceneTree
 
 const M1Test = preload("res://tests/m1_test.gd")
+const M3Test = preload("res://tests/m3_test.gd")
+const M4Test = preload("res://tests/m4_test.gd")
 
 func _init() -> void:
 	print("=== RUNNING TEST SUITE ===")
@@ -28,6 +30,16 @@ func _init() -> void:
 	var m1_results: Dictionary = M1Test.run_all_tests(game_state)
 	passed += m1_results["passed"]
 	failed += m1_results["failed"]
+	
+	# M3 test suite
+	var m3_results: Dictionary = M3Test.run_all_tests(game_state)
+	passed += m3_results["passed"]
+	failed += m3_results["failed"]
+	
+	# M4 test suite
+	var m4_results: Dictionary = M4Test.run_all_tests()
+	passed += m4_results["passed"]
+	failed += m4_results["failed"]
 	
 	print("=== RESULTS: %d PASSED, %d FAILED ===" % [passed, failed])
 	if failed > 0:

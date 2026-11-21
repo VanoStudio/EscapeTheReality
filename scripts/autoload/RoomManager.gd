@@ -25,10 +25,29 @@ var fade_overlay: ColorRect = null
 # Flag progress kejadian
 var k2_finished: bool = false
 var photo_puzzle_solved: bool = false
+var hud_instance: Node = null
+var pause_instance: Node = null
+var pending_screenshot: String = ""
 
 func _ready() -> void:
 	_setup_fade_overlay()
+	_setup_hud()
+	_setup_pause_menu()
 	_parse_cli_arguments()
+
+func _setup_hud() -> void:
+	if ResourceLoader.exists("res://scenes/ui/hud.tscn"):
+		var scene = load("res://scenes/ui/hud.tscn") as PackedScene
+		hud_instance = scene.instantiate()
+		hud_instance.name = "HUD"
+		add_child(hud_instance)
+
+func _setup_pause_menu() -> void:
+	if ResourceLoader.exists("res://scenes/ui/pause_menu.tscn"):
+		var scene = load("res://scenes/ui/pause_menu.tscn") as PackedScene
+		pause_instance = scene.instantiate()
+		pause_instance.name = "PauseMenu"
+		add_child(pause_instance)
 
 func _setup_fade_overlay() -> void:
 	var canvas = CanvasLayer.new()
@@ -50,6 +69,8 @@ func _parse_cli_arguments() -> void:
 			var r = arg.trim_prefix("--room=").to_upper()
 			if ROOM_SCENES.has(r):
 				current_room_id = r
+		elif arg.begins_with("--shot="):
+			pending_screenshot = arg.trim_prefix("--shot=")
 
 func register_room(room_node: Node, room_id: String) -> void:
 	current_room_node = room_node
@@ -111,6 +132,22 @@ func change_room(target_room_id: String, spawn_at_left: bool = true) -> void:
 		
 	is_transitioning = false
 	transition_finished.emit()
+	
+	if pending_screenshot != "":
+		var sname = pending_screenshot
+		pending_screenshot = ""
+		_save_screenshot(sname)
+
+func _save_screenshot(shot_name: String) -> void:
+	for i in range(5):
+		await get_tree().process_frame
+	var dir = DirAccess.open("res://")
+	if not dir.dir_exists("tests/screenshots"):
+		dir.make_dir_recursive("tests/screenshots")
+	var img = get_viewport().get_texture().get_image()
+	img.save_png("res://tests/screenshots/%s.png" % shot_name)
+	print("Screenshot captured: res://tests/screenshots/%s.png" % shot_name)
+	get_tree().quit(0)
 
 func respawn_player() -> void:
 	if current_player and current_room_node:

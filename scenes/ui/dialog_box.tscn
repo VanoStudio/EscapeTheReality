@@ -1,0 +1,98 @@
+[gd_scene load_steps=3 format=3 uid="uid://ui_dialog_box_001"]
+
+[ext_resource type="Script" path="res://scripts/ui/dialog_box.gd" id="1_dlg"]
+[ext_resource type="PackedScene" path="res://scenes/ui/choice_panel.tscn" id="2_choice"]
+
+[node name="DialogBox" type="CanvasLayer" node_paths=PackedStringArray("portrait_rect", "speaker_label", "text_label", "next_indicator", "choice_panel")]
+layer = 20
+script = ExtResource("1_dlg")
+portrait_rect = NodePath("BoxContainer/PortraitRect")
+speaker_label = NodePath("BoxContainer/SpeakerLabel")
+text_label = NodePath("BoxContainer/TextLabel")
+next_indicator = NodePath("BoxContainer/NextIndicator")
+choice_panel = NodePath("ChoicePanel")
+
+[node name="ChoicePanel" parent="." instance=ExtResource("2_choice")]
+visible = false
+
+[node name="BoxContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -650.0
+offset_top = -260.0
+offset_right = 650.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="BackgroundPanel" type="ColorRect" parent="BoxContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.08, 0.12, 0.92)
+
+[node name="Border" type="ReferenceRect" parent="BoxContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+border_color = Color(0.85, 0.75, 0.5, 0.8)
+border_width = 2.0
+editor_only = false
+
+[node name="PortraitRect" type="TextureRect" parent="BoxContainer"]
+texture_filter = 1
+layout_mode = 0
+offset_left = 20.0
+offset_top = -40.0
+offset_right = 240.0
+offset_bottom = 210.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SpeakerLabel" type="Label" parent="BoxContainer"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 18.0
+offset_right = 600.0
+offset_bottom = 50.0
+theme_override_colors/font_color = Color(0.95, 0.85, 0.5, 1)
+theme_override_font_sizes/font_size = 22
+text = "NAMA TOKOH"
+
+[node name="TextLabel" type="RichTextLabel" parent="BoxContainer"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 58.0
+offset_right = 1250.0
+offset_bottom = 180.0
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "Teks percakapan akan muncul di sini."
+
+[node name="NextIndicator" type="Label" parent="BoxContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -36.0
+offset_right = -30.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 0.8)
+theme_override_font_sizes/font_size = 14
+text = "[E / Enter] Lanjut ▶"

@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3 uid="uid://ui_pause_menu_001"]
+
+[ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="1_pause"]
+
+[node name="PauseMenu" type="CanvasLayer" node_paths=PackedStringArray("resume_button", "restart_button", "quit_button")]
+process_mode = 3
+layer = 50
+script = ExtResource("1_pause")
+resume_button = NodePath("ColorRect/VBoxContainer/ResumeBtn")
+restart_button = NodePath("ColorRect/VBoxContainer/RestartBtn")
+quit_button = NodePath("ColorRect/VBoxContainer/QuitBtn")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.75)
+
+[node name="Title" type="Label" parent="ColorRect"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 260.0
+offset_right = 200.0
+offset_bottom = 320.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.45, 1)
+theme_override_font_sizes/font_size = 36
+text = "JEDA (PAUSE)"
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -60.0
+offset_right = 180.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="ResumeBtn" type="Button" parent="ColorRect/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Lanjut Main"
+
+[node name="RestartBtn" type="Button" parent="ColorRect/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Ulang dari Awal"
+
+[node name="QuitBtn" type="Button" parent="ColorRect/VBoxContainer"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Keluar Game"

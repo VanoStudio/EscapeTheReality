@@ -1,0 +1,103 @@
+[gd_scene load_steps=4 format=3 uid="uid://scene_ending_001"]
+
+[ext_resource type="Script" path="res://scripts/ending.gd" id="1_end"]
+[ext_resource type="Texture2D" path="res://assets/processed/comic/comic_end_1.png" id="2_e1"]
+[ext_resource type="Texture2D" path="res://assets/processed/comic/comic_end_2.png" id="3_e2"]
+
+[node name="Ending" type="Control" node_paths=PackedStringArray("panel_1", "panel_2", "text_label", "title_credit", "team_credit")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_end")
+panel_1 = NodePath("Panel1")
+panel_2 = NodePath("Panel2")
+text_label = NodePath("TextLabel")
+title_credit = NodePath("TitleCredit")
+team_credit = NodePath("TeamCredit")
+
+[node name="BackgroundDark" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.04, 0.07, 1)
+
+[node name="Panel1" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 80.0
+offset_right = 900.0
+offset_bottom = 780.0
+texture = ExtResource("2_e1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Panel2" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1020.0
+offset_top = 80.0
+offset_right = 1700.0
+offset_bottom = 780.0
+texture = ExtResource("3_e2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -600.0
+offset_top = -260.0
+offset_right = 600.0
+offset_bottom = -210.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.9, 0.85, 0.7, 1)
+theme_override_font_sizes/font_size = 24
+text = "Hari pertama selesai. Masih ada dua hari lagi."
+horizontal_alignment = 1
+
+[node name="TitleCredit" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -400.0
+offset_top = -180.0
+offset_right = 400.0
+offset_bottom = -130.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
+theme_override_font_sizes/font_size = 32
+text = "BERSAMBUNG"
+horizontal_alignment = 1
+
+[node name="TeamCredit" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -500.0
+offset_top = -110.0
+offset_right = 500.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 0.9)
+theme_override_font_sizes/font_size = 18
+text = "Tugas Akhir · Erina Aprilia & Stevano Sunuprakoso Sosroraharjo
+Escape the Reality — Prototype Hari 1"
+horizontal_alignment = 1

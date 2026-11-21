@@ -3,9 +3,13 @@
 [ext_resource type="Script" path="res://scripts/rooms/base_room.gd" id="1_room"]
 [ext_resource type="Texture2D" path="res://assets/processed/rooms/bg_f1.png" id="2_bg"]
 [ext_resource type="PackedScene" path="res://scenes/actors/kirana.tscn" id="3_kirana"]
+[ext_resource type="Script" path="res://scripts/rooms/event_trigger.gd" id="4_trigger"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
 size = Vector2(20, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
+size = Vector2(40, 80)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_0"]
 size = Vector2(160, 40)
@@ -69,6 +73,16 @@ collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Platform_2"]
 shape = SubResource("RectangleShape2D_plat_2")
+
+[node name="PrologTrigger" type="Area2D" parent="."]
+position = Vector2(80, 220)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("4_trigger")
+event_name = "prolog"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PrologTrigger"]
+shape = SubResource("RectangleShape2D_trigger")
 
 [node name="Kirana" parent="." instance=ExtResource("3_kirana")]
 position = Vector2(40, 230)

@@ -1,0 +1,88 @@
+[gd_scene load_steps=5 format=3 uid="uid://ui_hud_001"]
+
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
+[ext_resource type="Shader" path="res://shaders/emotion_tint.gdshader" id="2_shader"]
+[ext_resource type="Texture2D" path="res://assets/processed/props/pocket_watch_teal.png" id="3_watch"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tint"]
+shader = ExtResource("2_shader")
+shader_parameter/tint_color = Color(0, 0, 0, 0)
+shader_parameter/tint_amount = 0.0
+shader_parameter/vignette_intensity = 0.0
+shader_parameter/shake_power = 0.0
+
+[node name="HUD" type="CanvasLayer" node_paths=PackedStringArray("watch_icon", "stability_bar", "stability_label", "timer_label", "scrap_label", "tint_rect")]
+layer = 10
+script = ExtResource("1_hud")
+watch_icon = NodePath("HUDContainer/WatchIcon")
+stability_bar = NodePath("HUDContainer/StabilityBar")
+stability_label = NodePath("HUDContainer/StabilityLabel")
+timer_label = NodePath("HUDContainer/TimerLabel")
+scrap_label = NodePath("HUDContainer/ScrapLabel")
+tint_rect = NodePath("TintRect")
+
+[node name="TintRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_tint")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HUDContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 40.0
+offset_top = 30.0
+offset_right = 500.0
+offset_bottom = 150.0
+
+[node name="WatchIcon" type="TextureRect" parent="HUDContainer"]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 90.0
+offset_bottom = 90.0
+pivot_offset = Vector2(45, 45)
+texture = ExtResource("3_watch")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StabilityBar" type="ProgressBar" parent="HUDContainer"]
+layout_mode = 0
+offset_left = 105.0
+offset_top = 30.0
+offset_right = 360.0
+offset_bottom = 54.0
+max_value = 100.0
+value = 60.0
+show_percentage = false
+
+[node name="StabilityLabel" type="Label" parent="HUDContainer"]
+layout_mode = 0
+offset_left = 110.0
+offset_top = 58.0
+offset_right = 260.0
+offset_bottom = 84.0
+text = "Stability: 60%"
+
+[node name="TimerLabel" type="Label" parent="HUDContainer"]
+visible = false
+layout_mode = 0
+offset_left = 375.0
+offset_top = 30.0
+offset_right = 470.0
+offset_bottom = 56.0
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+text = "00:30"
+
+[node name="ScrapLabel" type="Label" parent="HUDContainer"]
+visible = false
+layout_mode = 0
+offset_left = 105.0
+offset_top = 85.0
+offset_right = 280.0
+offset_bottom = 110.0
+theme_override_colors/font_color = Color(0.9, 0.8, 0.4, 1)
+text = "Sobekan Foto: 0/3"

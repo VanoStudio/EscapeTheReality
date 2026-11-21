@@ -20,13 +20,14 @@ config/icon="res://icon.svg"
 GameState="*res://scripts/autoload/GameState.gd"
 AssetRegistry="*res://scripts/autoload/AssetRegistry.gd"
 RoomManager="*res://scripts/autoload/RoomManager.gd"
+DialogManager="*res://scripts/autoload/DialogManager.gd"
+AudioManager="*res://scripts/autoload/AudioManager.gd"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
 
 [input]
 
