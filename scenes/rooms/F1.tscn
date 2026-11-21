@@ -1,0 +1,74 @@
+[gd_scene load_steps=8 format=3 uid="uid://room_f1_001"]
+
+[ext_resource type="Script" path="res://scripts/rooms/base_room.gd" id="1_room"]
+[ext_resource type="Texture2D" path="res://assets/processed/rooms/bg_f1.png" id="2_bg"]
+[ext_resource type="PackedScene" path="res://scenes/actors/kirana.tscn" id="3_kirana"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(20, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_0"]
+size = Vector2(160, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_1"]
+size = Vector2(100, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_2"]
+size = Vector2(140, 20)
+
+[node name="F1" type="Node2D"]
+script = ExtResource("1_room")
+room_id = "F1"
+next_room_id = "F2"
+prev_room_id = ""
+
+[node name="Background" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(240, 135)
+scale = Vector2(0.175, 0.175)
+texture = ExtResource("2_bg")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(240, 135)
+zoom = Vector2(4, 4)
+
+[node name="SpawnLeft" type="Marker2D" parent="."]
+position = Vector2(40, 230)
+
+[node name="SpawnRight" type="Marker2D" parent="."]
+position = Vector2(440, 230)
+
+[node name="ExitRight" type="Area2D" parent="."]
+position = Vector2(475, 210)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitRight"]
+shape = SubResource("RectangleShape2D_door")
+
+[node name="Platform_0" type="StaticBody2D" parent="."]
+position = Vector2(80, 255)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform_0"]
+shape = SubResource("RectangleShape2D_plat_0")
+
+[node name="Platform_1" type="StaticBody2D" parent="."]
+position = Vector2(240, 235)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform_1"]
+shape = SubResource("RectangleShape2D_plat_1")
+
+[node name="Platform_2" type="StaticBody2D" parent="."]
+position = Vector2(400, 215)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform_2"]
+shape = SubResource("RectangleShape2D_plat_2")
+
+[node name="Kirana" parent="." instance=ExtResource("3_kirana")]
+position = Vector2(40, 230)

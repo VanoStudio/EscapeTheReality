@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameState="*res://scripts/autoload/GameState.gd"
+AssetRegistry="*res://scripts/autoload/AssetRegistry.gd"
+RoomManager="*res://scripts/autoload/RoomManager.gd"
 
 [display]
 
