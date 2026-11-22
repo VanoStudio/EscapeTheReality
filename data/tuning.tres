@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Tuning" load_steps=2 format=3 uid="uid://tuning_res_001"]
+[gd_resource type="Resource" script_class="Tuning" load_steps=2 format=3 uid="uid://c5r0rq7frwcrh"]
 
 [ext_resource type="Script" path="res://scripts/tuning.gd" id="1_tuning"]
 
@@ -24,8 +24,8 @@ opacity_jujur_hampir_meledak = 0.55
 tint_kesel_orange_alpha = 0.15
 tint_hampir_meledak_red_alpha = 0.3
 rewind_duration = 1.5
-walk_speed = 80.0
-jump_velocity = -230.0
-gravity = 600.0
+walk_speed = 110.0
+jump_velocity = -240.0
+gravity = 650.0
 coyote_time = 0.1
 jump_buffer = 0.1

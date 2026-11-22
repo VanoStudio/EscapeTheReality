@@ -11,6 +11,12 @@ var time_limit: float = 0.0
 var time_remaining: float = 0.0
 var is_active: bool = false
 var buttons: Array[Button] = []
+var cached_hud: Node = null
+
+func _get_hud() -> Node:
+	if cached_hud == null:
+		cached_hud = get_tree().root.find_child("HUD", true, false)
+	return cached_hud
 
 func _ready() -> void:
 	if button_container == null and has_node("VBoxContainer"):
@@ -27,7 +33,7 @@ func _process(delta: float) -> void:
 		if timer_bar:
 			timer_bar.value = time_remaining
 		# Update countdown di HUD jika ada
-		var hud = get_tree().root.find_child("HUD", true, false)
+		var hud = _get_hud()
 		if hud and hud.has_method("set_timer_display"):
 			hud.set_timer_display(time_remaining, true)
 			
@@ -116,6 +122,9 @@ func _on_button_pressed(choice_data: Dictionary) -> void:
 		return
 	is_active = false
 	visible = false
+	var am = get_node_or_null("/root/AudioManager")
+	if am:
+		am.play_sfx("select")
 	var hud = get_tree().root.find_child("HUD", true, false)
 	if hud and hud.has_method("set_timer_display"):
 		hud.set_timer_display(0.0, false)

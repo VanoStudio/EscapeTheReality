@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://ui_dialog_box_001"]
+[gd_scene load_steps=3 format=3 uid="uid://cg2u1wcdo2oas"]
 
 [ext_resource type="Script" path="res://scripts/ui/dialog_box.gd" id="1_dlg"]
 [ext_resource type="PackedScene" path="res://scenes/ui/choice_panel.tscn" id="2_choice"]

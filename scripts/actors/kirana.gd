@@ -18,15 +18,26 @@ var is_movement_enabled: bool = true
 
 # Prosedural squash & stretch
 var base_scale: Vector2 = Vector2.ONE
+var base_sprite_y: float = -22.0
 var anim_phase: float = 0.0
+var was_on_floor: bool = true
+var footstep_timer: float = 0.2
+var walk_frame_timer: float = 0.0
+var current_is_fantasy: bool = false
+var cached_ar: Node = null
+var cached_am: Node = null
 
 func _ready() -> void:
 	add_to_group("player")
 	_load_tuning()
 	base_scale = scale
-	RoomManager.register_player(self)
+	cached_ar = get_node_or_null("/root/AssetRegistry")
+	cached_am = get_node_or_null("/root/AudioManager")
 	if sprite == null and has_node("Sprite2D"):
 		sprite = $Sprite2D
+	if sprite:
+		base_sprite_y = sprite.position.y
+	RoomManager.register_player(self)
 
 func _load_tuning() -> void:
 	if GameState and GameState.tuning:
@@ -42,9 +53,23 @@ func set_movement_enabled(enabled: bool) -> void:
 		velocity.x = 0
 		if sprite:
 			sprite.scale = Vector2.ONE
+			sprite.position.y = base_sprite_y
 
 func set_can_jump(allowed: bool) -> void:
 	can_jump = allowed
+
+func update_character_visual(is_fantasy: bool) -> void:
+	current_is_fantasy = is_fantasy
+	if sprite == null and has_node("Sprite2D"):
+		sprite = $Sprite2D
+	var ar = get_node_or_null("/root/AssetRegistry")
+	if sprite and ar:
+		var tex_key = "kirana_fantasi" if is_fantasy else "kirana_rumah"
+		var path = ar.CHARACTERS.get(tex_key, "")
+		if path != "":
+			var tex = ar.get_texture(path)
+			if tex:
+				sprite.texture = tex
 
 func _physics_process(delta: float) -> void:
 	# Void fall check (di luar layar 270 px)
@@ -79,6 +104,16 @@ func _physics_process(delta: float) -> void:
 		# Jump stretch
 		if sprite:
 			sprite.scale = Vector2(0.85, 1.2)
+		if cached_am:
+			cached_am.play_sfx("jump")
+
+	# Landing squash
+	if not was_on_floor and is_on_floor():
+		if sprite:
+			sprite.scale = Vector2(1.15, 0.85)
+		if cached_am:
+			cached_am.play_sfx("land")
+	was_on_floor = is_on_floor()
 
 	# Horizontal movement
 	var dir = Input.get_axis("move_left", "move_right")
@@ -86,14 +121,37 @@ func _physics_process(delta: float) -> void:
 		velocity.x = dir * walk_speed
 		if sprite:
 			sprite.flip_h = dir < 0.0
-			# Walk bobbing
+			# Walk bobbing & frame animation
 			anim_phase += delta * 12.0
-			sprite.position.y = -2.0 + sin(anim_phase) * 1.5
+			sprite.position.y = base_sprite_y + sin(anim_phase) * 1.5
+			
+			walk_frame_timer += delta * 8.0
+			var frame_idx = int(walk_frame_timer) % 4
+			var frame_key = ("kirana_fantasi_walk_" if current_is_fantasy else "kirana_rumah_walk_") + str(frame_idx)
+			if cached_ar and cached_ar.CHARACTERS.has(frame_key):
+				var frame_tex = cached_ar.get_texture(cached_ar.CHARACTERS[frame_key])
+				if frame_tex:
+					sprite.texture = frame_tex
+					
+		if is_on_floor():
+			footstep_timer += delta
+			if footstep_timer >= 0.28:
+				footstep_timer = 0.0
+				if cached_am:
+					cached_am.play_sfx("footstep")
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, walk_speed)
 		anim_phase = 0.0
+		footstep_timer = 0.2
+		walk_frame_timer = 0.0
 		if sprite:
-			sprite.position.y = 0.0
+			sprite.position.y = base_sprite_y
+			# Reset to idle standing frame
+			var idle_key = "kirana_fantasi" if current_is_fantasy else "kirana_rumah"
+			if cached_ar and cached_ar.CHARACTERS.has(idle_key):
+				var idle_tex = cached_ar.get_texture(cached_ar.CHARACTERS[idle_key])
+				if idle_tex:
+					sprite.texture = idle_tex
 
 	# Recover squash/stretch
 	if sprite:

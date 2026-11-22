@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://scene_opening_001"]
+[gd_scene load_steps=8 format=3 uid="uid://d0bg003h2kjpu"]
 
 [ext_resource type="Script" path="res://scripts/opening.gd" id="1_open"]
 [ext_resource type="Texture2D" path="res://assets/processed/comic/comic_open_1.png" id="2_p1"]

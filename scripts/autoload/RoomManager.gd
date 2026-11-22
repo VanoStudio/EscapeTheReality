@@ -28,6 +28,7 @@ var photo_puzzle_solved: bool = false
 var hud_instance: Node = null
 var pause_instance: Node = null
 var pending_screenshot: String = ""
+var next_spawn_left: bool = true
 
 func _ready() -> void:
 	_setup_fade_overlay()
@@ -63,7 +64,8 @@ func _setup_fade_overlay() -> void:
 	canvas.add_child(fade_overlay)
 
 func _parse_cli_arguments() -> void:
-	var args = OS.get_cmdline_user_args()
+	var args = Array(OS.get_cmdline_user_args())
+	args.append_array(OS.get_cmdline_args())
 	for arg in args:
 		if arg.begins_with("--room="):
 			var r = arg.trim_prefix("--room=").to_upper()
@@ -72,10 +74,17 @@ func _parse_cli_arguments() -> void:
 		elif arg.begins_with("--shot="):
 			pending_screenshot = arg.trim_prefix("--shot=")
 
+func _reposition_player() -> void:
+	if is_instance_valid(current_player) and is_instance_valid(current_room_node):
+		var marker_name = "SpawnLeft" if next_spawn_left else "SpawnRight"
+		if current_room_node.has_node(marker_name):
+			current_player.global_position = current_room_node.get_node(marker_name).global_position
+
 func register_room(room_node: Node, room_id: String) -> void:
 	current_room_node = room_node
 	current_room_id = room_id
 	GameState.current_room = room_id
+	_reposition_player()
 	room_changed.emit(room_id)
 
 func register_player(player_node: CharacterBody2D) -> void:
@@ -83,6 +92,9 @@ func register_player(player_node: CharacterBody2D) -> void:
 	# Update player jumping capability based on world (R vs F)
 	if current_player.has_method("set_can_jump"):
 		current_player.set_can_jump(is_fantasy_world())
+	if current_player.has_method("update_character_visual"):
+		current_player.update_character_visual(is_fantasy_world())
+	_reposition_player()
 
 func is_fantasy_world() -> bool:
 	return current_room_id.begins_with("F")
@@ -96,8 +108,9 @@ func change_room(target_room_id: String, spawn_at_left: bool = true) -> void:
 		
 	is_transitioning = true
 	transition_started.emit()
+	next_spawn_left = spawn_at_left
 	
-	if current_player and current_player.has_method("set_movement_enabled"):
+	if is_instance_valid(current_player) and current_player.has_method("set_movement_enabled"):
 		current_player.set_movement_enabled(false)
 		
 	# Fade out 0.3s
@@ -113,21 +126,16 @@ func change_room(target_room_id: String, spawn_at_left: bool = true) -> void:
 	
 	# Tunggu frame agar scene baru siap
 	await get_tree().process_frame
+	await get_tree().process_frame
 	
-	# Reposition player if registered
-	if current_player and current_room_node:
-		var spawn_pos = Vector2(30, 210) if spawn_at_left else Vector2(450, 210)
-		var marker_name = "SpawnLeft" if spawn_at_left else "SpawnRight"
-		if current_room_node.has_node(marker_name):
-			spawn_pos = current_room_node.get_node(marker_name).global_position
-		current_player.global_position = spawn_pos
+	_reposition_player()
 		
 	# Fade in 0.3s
 	var tween_in = create_tween()
 	tween_in.tween_property(fade_overlay, "color:a", 0.0, 0.3)
 	await tween_in.finished
 	
-	if current_player and current_player.has_method("set_movement_enabled"):
+	if is_instance_valid(current_player) and current_player.has_method("set_movement_enabled"):
 		current_player.set_movement_enabled(true)
 		
 	is_transitioning = false

@@ -9,6 +9,8 @@ extends Control
 var current_step: int = 0
 var is_animating: bool = false
 var total_steps: int = 6
+var esc_hold_time: float = 0.0
+var esc_progress_bar: ProgressBar = null
 
 var panel_texts = [
 	"", # Panel 1: Tidak ada balon
@@ -21,19 +23,47 @@ var panel_texts = [
 
 func _ready() -> void:
 	if skip_hint:
-		skip_hint.text = "[Enter / Spasi] Lanjut  |  [Esc] Lewati"
+		skip_hint.text = "[Enter / Spasi] Lanjut  |  [Tahan Esc 3 Detik] Lewati"
+	_setup_esc_progress()
 	_show_step(0)
 
+func _setup_esc_progress() -> void:
+	esc_progress_bar = ProgressBar.new()
+	esc_progress_bar.name = "EscProgressBar"
+	esc_progress_bar.visible = false
+	esc_progress_bar.min_value = 0.0
+	esc_progress_bar.max_value = 100.0
+	esc_progress_bar.value = 0.0
+	esc_progress_bar.show_percentage = false
+	esc_progress_bar.size = Vector2(160, 8)
+	esc_progress_bar.position = Vector2(30, 250)
+	add_child(esc_progress_bar)
+
+func _process(delta: float) -> void:
+	if Input.is_action_pressed("pause") or Input.is_key_pressed(KEY_ESCAPE):
+		esc_hold_time += delta
+		if esc_progress_bar:
+			esc_progress_bar.visible = true
+			esc_progress_bar.value = (esc_hold_time / 3.0) * 100.0
+		if esc_hold_time >= 3.0:
+			set_process(false)
+			_skip_to_gameplay()
+	else:
+		esc_hold_time = 0.0
+		if esc_progress_bar:
+			esc_progress_bar.visible = false
+			esc_progress_bar.value = 0.0
+
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
-		_skip_to_gameplay()
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("interact") or event.is_action_pressed("jump") or event.is_action_pressed("ui_accept"):
+	if event.is_action_pressed("interact") or event.is_action_pressed("jump") or event.is_action_pressed("ui_accept"):
 		if not is_animating:
 			_advance_step()
 		get_viewport().set_input_as_handled()
 
 func _advance_step() -> void:
+	var am = get_node_or_null("/root/AudioManager")
+	if am:
+		am.play_sfx("select")
 	current_step += 1
 	if current_step >= total_steps:
 		_skip_to_gameplay()
@@ -62,9 +92,15 @@ func _show_step(idx: int) -> void:
 		tween.tween_property(p, "modulate:a", 1.0, 0.35)
 		tween.parallel().tween_property(p, "position:y", p.position.y - 20.0, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		
-		# Khusus Panel 4: Hentakan, kilat putih & shake
-		if idx == 3:
+		# Audio per momen dramatis komik
+		var am = get_node_or_null("/root/AudioManager")
+		if idx == 2 and am: # Panel 3: Matanya berkaca-kaca, detak jantung
+			am.play_sfx("heartbeat")
+		elif idx == 3: # Panel 4: Bentakan, hentakan impact & shake
+			if am: am.play_sfx("impact")
 			_shake_screen()
+		elif idx == 5 and am: # Panel 6: Pintu dibanting
+			am.play_sfx("door_slam")
 			
 		await tween.finished
 		

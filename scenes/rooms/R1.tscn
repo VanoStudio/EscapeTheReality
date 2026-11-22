@@ -1,14 +1,18 @@
-[gd_scene load_steps=6 format=3 uid="uid://room_r1_001"]
+[gd_scene load_steps=8 format=3 uid="uid://d13c77335gfcv"]
 
 [ext_resource type="Script" path="res://scripts/rooms/base_room.gd" id="1_room"]
 [ext_resource type="Texture2D" path="res://assets/processed/rooms/bg_r1.png" id="2_bg"]
 [ext_resource type="PackedScene" path="res://scenes/actors/kirana.tscn" id="3_kirana"]
+[ext_resource type="Script" path="res://scripts/rooms/interactable_object.gd" id="4_interact"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
 size = Vector2(480, 40)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
-size = Vector2(20, 80)
+size = Vector2(20, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_photo"]
+size = Vector2(60, 60)
 
 [node name="R1" type="Node2D"]
 script = ExtResource("1_room")
@@ -18,7 +22,7 @@ next_room_id = "R2"
 [node name="Background" type="Sprite2D" parent="."]
 texture_filter = 1
 position = Vector2(240, 135)
-scale = Vector2(0.175, 0.175)
+scale = Vector2(0.175781, 0.175781)
 texture = ExtResource("2_bg")
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -26,7 +30,7 @@ position = Vector2(240, 135)
 zoom = Vector2(4, 4)
 
 [node name="Ground" type="StaticBody2D" parent="."]
-position = Vector2(240, 255)
+position = Vector2(240, 235)
 collision_layer = 1
 collision_mask = 0
 
@@ -34,18 +38,28 @@ collision_mask = 0
 shape = SubResource("RectangleShape2D_ground")
 
 [node name="SpawnLeft" type="Marker2D" parent="."]
-position = Vector2(40, 230)
+position = Vector2(40, 215)
 
 [node name="SpawnRight" type="Marker2D" parent="."]
-position = Vector2(440, 230)
+position = Vector2(440, 215)
 
 [node name="ExitRight" type="Area2D" parent="."]
-position = Vector2(475, 210)
+position = Vector2(470, 195)
 collision_layer = 0
 collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ExitRight"]
 shape = SubResource("RectangleShape2D_door")
 
+[node name="FamilyPhoto" type="Area2D" parent="."]
+position = Vector2(200, 185)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("4_interact")
+memory_key = "r1_photo"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FamilyPhoto"]
+shape = SubResource("RectangleShape2D_photo")
+
 [node name="Kirana" parent="." instance=ExtResource("3_kirana")]
-position = Vector2(40, 230)
+position = Vector2(40, 215)

@@ -326,6 +326,8 @@ static func test_data_validation() -> String:
 	if rooms_file == null:
 		return "rooms.json missing"
 	var rooms_data = JSON.parse_string(rooms_file.get_as_text())
+	if not (rooms_data is Dictionary):
+		return "rooms.json is not valid Dictionary"
 	for key in rooms_data.keys():
 		var item = rooms_data[key]
 		if not (item.get("speaker", "") in valid_speakers):

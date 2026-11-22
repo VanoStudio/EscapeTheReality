@@ -18,12 +18,14 @@ var typing_timer: float = 0.0
 var is_typing: bool = false
 var is_waiting_for_input: bool = false
 var is_waiting_for_choice: bool = false
+var cached_am: Node = null
 
 var shadow_material: ShaderMaterial
 
 func _ready() -> void:
 	layer = 20
 	visible = false
+	cached_am = get_node_or_null("/root/AudioManager")
 	_setup_shadow_material()
 	if choice_panel:
 		choice_panel.choice_selected.connect(_on_choice_selected)
@@ -41,6 +43,8 @@ func _process(delta: float) -> void:
 			typing_timer = 0.0
 			visible_chars += 1
 			text_label.visible_characters = visible_chars
+			if visible_chars % 2 == 1 and cached_am:
+				cached_am.play_sfx("text_blip")
 			if visible_chars >= current_text.length():
 				_finish_typing()
 
@@ -56,10 +60,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not visible:
 		return
 		
-	if is_typing and (event.is_action_pressed("interact") or event.is_action_pressed("jump")):
+	if is_typing and (event.is_action_pressed("interact") or event.is_action_pressed("jump") or event.is_action_pressed("ui_accept")):
 		_finish_typing()
 		get_viewport().set_input_as_handled()
-	elif is_waiting_for_input and event.is_action_pressed("interact"):
+	elif is_waiting_for_input and (event.is_action_pressed("interact") or event.is_action_pressed("jump") or event.is_action_pressed("ui_accept")):
 		is_waiting_for_input = false
 		if next_indicator:
 			next_indicator.visible = false
@@ -94,7 +98,9 @@ func _update_speaker(speaker_key: String, expression: String) -> void:
 	if ResourceLoader.exists("res://data/names.json"):
 		var f = FileAccess.open("res://data/names.json", FileAccess.READ)
 		if f:
-			names_data = JSON.parse_string(f.get_as_text())
+			var parsed = JSON.parse_string(f.get_as_text())
+			if parsed is Dictionary:
+				names_data = parsed
 			
 	var display_name = names_data.get(spk, spk.capitalize())
 	if speaker_label:

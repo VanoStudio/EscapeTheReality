@@ -48,19 +48,36 @@ func update_hud() -> void:
 	var gs = _get_game_state()
 	if gs == null:
 		return
+	var rm = _get_room_manager()
+	if rm and not rm.is_fantasy_world():
+		if stability_bar: stability_bar.visible = false
+		if stability_label: stability_label.visible = false
+		if watch_icon: watch_icon.visible = false
+		if scrap_label: scrap_label.visible = false
+		return
+	else:
+		if stability_bar: stability_bar.visible = true
+		if stability_label: stability_label.visible = true
+		if watch_icon: watch_icon.visible = true
+		
 	var stab = gs.stability
 	var tier = gs.get_tier()
 	
 	if stability_bar:
-		stability_bar.value = stab
+		var bar_tween = create_tween()
+		bar_tween.tween_property(stability_bar, "value", float(stab), 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	if stability_label:
 		stability_label.text = str(stab) + "%"
 		
 	_update_watch_texture(tier)
 	_update_tint_effect(tier)
 	
+	if watch_icon:
+		var watch_tween = create_tween()
+		watch_tween.tween_property(watch_icon, "scale", Vector2(1.18, 1.18), 0.12)
+		watch_tween.tween_property(watch_icon, "scale", Vector2.ONE, 0.15)
+	
 	if scrap_label:
-		var rm = _get_room_manager()
 		if rm and rm.current_room_id == "F4":
 			scrap_label.visible = true
 			scrap_label.text = "Sobekan Foto: %d/3" % gs.photo_scraps

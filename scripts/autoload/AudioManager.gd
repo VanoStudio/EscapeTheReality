@@ -10,6 +10,7 @@ var sfx_player: AudioStreamPlayer
 var tick_timer: float = 0.0
 var tick_interval: float = 1.0 # Tenang = 1.0s, Kesal = 0.6s, Hampir Meledak = 0.35s
 var is_clock_active: bool = true
+var sfx_cache: Dictionary = {}
 
 func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
@@ -26,16 +27,19 @@ func _ready() -> void:
 	var rm = _get_room_manager()
 	if rm:
 		rm.room_changed.connect(_on_room_changed)
+		_on_room_changed(rm.current_room_id)
+	else:
+		_on_room_changed("R1")
 
 func _setup_players() -> void:
 	bgm_player = AudioStreamPlayer.new()
 	bgm_player.name = "BGM"
-	bgm_player.volume_db = -10.0
+	bgm_player.volume_db = -8.0
 	add_child(bgm_player)
 	
 	ambience_player = AudioStreamPlayer.new()
 	ambience_player.name = "Ambience"
-	ambience_player.volume_db = -12.0
+	ambience_player.volume_db = -10.0
 	add_child(ambience_player)
 	
 	clock_player = AudioStreamPlayer.new()
@@ -48,6 +52,36 @@ func _setup_players() -> void:
 	sfx_player.volume_db = -4.0
 	add_child(sfx_player)
 
+func get_sfx_stream(sfx_name: String) -> AudioStream:
+	if sfx_cache.has(sfx_name):
+		return sfx_cache[sfx_name]
+	var path = "res://assets/audio/sfx/%s.wav" % sfx_name
+	if ResourceLoader.exists(path):
+		var st = load(path) as AudioStream
+		sfx_cache[sfx_name] = st
+		return st
+	return null
+
+func play_ambience(track_name: String) -> void:
+	var path = "res://assets/audio/ambience/%s.wav" % track_name
+	if ResourceLoader.exists(path):
+		var st = load(path) as AudioStream
+		if ambience_player.stream != st:
+			ambience_player.stream = st
+			ambience_player.play()
+
+func play_bgm(track_name: String) -> void:
+	var path = "res://assets/audio/music/%s.wav" % track_name
+	if ResourceLoader.exists(path):
+		var st = load(path) as AudioStream
+		if bgm_player.stream != st:
+			bgm_player.stream = st
+			bgm_player.play()
+
+func stop_bgm() -> void:
+	if bgm_player.playing:
+		bgm_player.stop()
+
 func _process(delta: float) -> void:
 	if not is_clock_active:
 		return
@@ -59,23 +93,28 @@ func _process(delta: float) -> void:
 		play_tick()
 
 func play_tick() -> void:
-	# Cek apakah ada file audio detak jam
-	if ResourceLoader.exists("res://assets/audio/sfx/tick.wav"):
-		clock_player.stream = load("res://assets/audio/sfx/tick.wav")
+	var st = get_sfx_stream("tick")
+	if st:
+		clock_player.stream = st
 		clock_player.play()
 	else:
-		# Procedural tick
 		_play_synthetic_beep(800.0, 0.03, clock_player)
 
 func play_sfx(sfx_name: String) -> void:
-	var path = "res://assets/audio/sfx/%s.wav" % sfx_name
-	if ResourceLoader.exists(path):
-		sfx_player.stream = load(path)
+	var st = get_sfx_stream(sfx_name)
+	if st:
+		sfx_player.stream = st
 		sfx_player.play()
 	else:
 		match sfx_name:
 			"jump":
 				_play_synthetic_beep(450.0, 0.08, sfx_player)
+			"footstep":
+				_play_synthetic_beep(120.0, 0.03, sfx_player)
+			"land":
+				_play_synthetic_beep(90.0, 0.06, sfx_player)
+			"text_blip":
+				_play_synthetic_beep(880.0, 0.02, sfx_player)
 			"pickup":
 				_play_synthetic_beep(900.0, 0.12, sfx_player)
 			"select":
@@ -129,10 +168,15 @@ func _on_loop_triggered() -> void:
 	is_clock_active = true
 
 func _on_room_changed(room_id: String) -> void:
-	# Ganti ambience berdasarkan rumah asli vs fantasi
 	if room_id.begins_with("R"):
-		# Rumah asli: ambience tenang
+		# Rumah asli: suasana malam jangkrik & kipas, belum ada detak jam kalung
+		is_clock_active = false
 		ambience_player.pitch_scale = 1.0
+		play_ambience("night_room")
+		stop_bgm()
 	else:
-		# Dunia fantasi: ambience bernada rendah dan bergema
+		# Dunia fantasi: detak jam saku kalung aktif, musik fantasi dan drone bergema
+		is_clock_active = true
 		ambience_player.pitch_scale = 0.8
+		play_ambience("fantasy_drone")
+		play_bgm("fantasy_piano")

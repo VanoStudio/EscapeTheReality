@@ -48,6 +48,27 @@ const SCRAPS = {
 	"photo_completed": "res://assets/processed/props/photo_completed.png"
 }
 
+const CHARACTERS = {
+	"kirana_rumah": "res://assets/processed/characters/kirana_rumah.png",
+	"kirana_fantasi": "res://assets/processed/characters/kirana_idle.png",
+	"kirana_rumah_walk_0": "res://assets/processed/characters/kirana_rumah_walk_0.png",
+	"kirana_rumah_walk_1": "res://assets/processed/characters/kirana_rumah_walk_1.png",
+	"kirana_rumah_walk_2": "res://assets/processed/characters/kirana_rumah_walk_2.png",
+	"kirana_rumah_walk_3": "res://assets/processed/characters/kirana_rumah_walk_3.png",
+	"kirana_fantasi_walk_0": "res://assets/processed/characters/kirana_fantasi_walk_0.png",
+	"kirana_fantasi_walk_1": "res://assets/processed/characters/kirana_fantasi_walk_1.png",
+	"kirana_fantasi_walk_2": "res://assets/processed/characters/kirana_fantasi_walk_2.png",
+	"kirana_fantasi_walk_3": "res://assets/processed/characters/kirana_fantasi_walk_3.png",
+	"penjual": "res://assets/processed/characters/penjual.png",
+	"bayangan": "res://assets/processed/characters/bayangan.png"
+}
+
+const PROPS = {
+	"ground_watch": "res://assets/processed/props/ground_watch.png",
+	"family_photo": "res://assets/processed/props/family_photo.png",
+	"interact_hint": "res://assets/processed/ui/interact_hint.png"
+}
+
 func get_texture(path: String) -> Texture2D:
 	if ResourceLoader.exists(path):
 		return load(path) as Texture2D

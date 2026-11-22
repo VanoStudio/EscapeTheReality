@@ -1,7 +1,8 @@
 extends Node
 
 func _ready() -> void:
-	var args = OS.get_cmdline_user_args()
+	var args = Array(OS.get_cmdline_user_args())
+	args.append_array(OS.get_cmdline_args())
 	var target_room = RoomManager.current_room_id
 	var skip_opening = false
 	var custom_stability = -1

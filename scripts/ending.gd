@@ -24,6 +24,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_tree().change_scene_to_file("res://scenes/main.tscn")
 
 func _play_ending_sequence() -> void:
+	var am = get_node_or_null("/root/AudioManager")
+	if am:
+		am.play_bgm("ending_warm")
+		am.is_clock_active = false
+		
 	# 1. Fade in Panel 1
 	var tween1 = create_tween()
 	tween1.tween_property(panel_1, "modulate:a", 1.0, 1.0)

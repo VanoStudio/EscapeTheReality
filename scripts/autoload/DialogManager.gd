@@ -44,7 +44,8 @@ func _load_all_data() -> void:
 	names_data = dialog_cache.get("names", {})
 
 func _parse_bot_args() -> void:
-	var args = OS.get_cmdline_user_args()
+	var args = Array(OS.get_cmdline_user_args())
+	args.append_array(OS.get_cmdline_args())
 	for arg in args:
 		if arg.begins_with("--bot="):
 			bot_choice_type = arg.trim_prefix("--bot=").to_lower()
@@ -60,14 +61,19 @@ func _freeze_player(freeze: bool) -> void:
 	if rm and rm.current_player and rm.current_player.has_method("set_movement_enabled"):
 		rm.current_player.set_movement_enabled(not freeze)
 
+func is_dialog_active() -> bool:
+	return is_active or (dialog_box != null and dialog_box.visible)
+
 func show_shadow_dialog(text: String) -> void:
 	if dialog_box == null:
 		return
+	is_active = true
 	_freeze_player(true)
 	dialog_box.show_line("bayangan", text, "biasa")
 	await dialog_box.line_finished
 	dialog_box.close_dialog()
 	_freeze_player(false)
+	is_active = false
 
 func show_memory_line(key: String) -> void:
 	if dialog_box == null:
@@ -79,11 +85,13 @@ func show_memory_line(key: String) -> void:
 	if text == "":
 		return
 		
+	is_active = true
 	_freeze_player(true)
 	dialog_box.show_line(spk, text, "biasa")
 	await dialog_box.line_finished
 	dialog_box.close_dialog()
 	_freeze_player(false)
+	is_active = false
 
 func play_prolog() -> void:
 	if dialog_box == null:
@@ -93,6 +101,7 @@ func play_prolog() -> void:
 	if lines.is_empty():
 		return
 		
+	is_active = true
 	_freeze_player(true)
 	for item in lines:
 		var spk = item.get("speaker", "")
@@ -107,6 +116,7 @@ func play_prolog() -> void:
 			
 	dialog_box.close_dialog()
 	_freeze_player(false)
+	is_active = false
 	event_finished.emit("prolog")
 
 func play_k1() -> void:
@@ -117,6 +127,7 @@ func play_k1() -> void:
 	if rounds.is_empty():
 		return
 		
+	is_active = true
 	var gs = _get_game_state()
 	_freeze_player(true)
 	if gs:
@@ -169,6 +180,7 @@ func play_k1() -> void:
 	
 	dialog_box.close_dialog()
 	_freeze_player(false)
+	is_active = false
 	event_finished.emit("k1")
 
 func start_k2_round(round_idx: int) -> void:
@@ -179,10 +191,20 @@ func start_k2_round(round_idx: int) -> void:
 	if round_idx < 1 or round_idx > rounds.size():
 		return
 		
+	is_active = true
 	var gs = _get_game_state()
 	_freeze_player(true)
 	if round_idx == 1 and gs:
-		gs.enter_event("k2")
+		var penalty = gs.enter_event("k2")
+		if penalty > 0:
+			var bomb_text = system_data.get("pendam_bomb", {}).get("text", "Inget yang tadi kamu pendam? Aku masih bawa.")
+			dialog_box.show_line("bayangan", bomb_text, "biasa")
+			if bot_choice_type != "":
+				await get_tree().create_timer(0.2).timeout
+				dialog_box._finish_typing()
+				await get_tree().create_timer(0.1).timeout
+			else:
+				await dialog_box.line_finished
 		
 	var r = rounds[round_idx - 1]
 	for line in r.get("setup", []):
@@ -217,6 +239,7 @@ func start_k2_round(round_idx: int) -> void:
 	
 	dialog_box.close_dialog()
 	_freeze_player(false)
+	is_active = false
 	
 	# Cek apakah terjadi time loop
 	if res.get("loop", false):
@@ -243,10 +266,20 @@ func start_k3_round(round_idx: int) -> void:
 	if round_idx < 1 or round_idx > rounds.size():
 		return
 		
+	is_active = true
 	var gs = _get_game_state()
 	_freeze_player(true)
 	if round_idx == 1 and gs:
-		gs.enter_event("k3")
+		var penalty = gs.enter_event("k3")
+		if penalty > 0:
+			var bomb_text = system_data.get("pendam_bomb", {}).get("text", "Inget yang tadi kamu pendam? Aku masih bawa.")
+			dialog_box.show_line("bayangan", bomb_text, "biasa")
+			if bot_choice_type != "":
+				await get_tree().create_timer(0.2).timeout
+				dialog_box._finish_typing()
+				await get_tree().create_timer(0.1).timeout
+			else:
+				await dialog_box.line_finished
 		
 	var r = rounds[round_idx - 1]
 	for line in r.get("setup", []):
@@ -294,7 +327,10 @@ func start_k3_round(round_idx: int) -> void:
 			await dialog_box.line_finished
 			dialog_box.close_dialog()
 			_freeze_player(false)
+			is_active = false
 			event_finished.emit("k3")
+			# Tunggu animasi Bayangan menyatu ke Kirana (0.8s) + fadeout (0.4s)
+			await get_tree().create_timer(1.2).timeout
 			# Pindah ke scene ending
 			if ResourceLoader.exists("res://scenes/ending.tscn"):
 				get_tree().change_scene_to_file("res://scenes/ending.tscn")
