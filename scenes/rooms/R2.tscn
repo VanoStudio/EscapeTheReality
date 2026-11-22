@@ -57,8 +57,9 @@ script = ExtResource("4_interact")
 trigger_once = true
 
 [node name="WatchSprite" type="Sprite2D" parent="GroundWatch"]
-texture_filter = 0
-position = Vector2(0, 0)
+texture_filter = 1
+position = Vector2(0, -5)
+scale = Vector2(0.028, 0.028)
 texture = ExtResource("5_watch")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GroundWatch"]

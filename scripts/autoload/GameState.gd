@@ -1,6 +1,5 @@
 extends Node
 
-const Tuning = preload("res://scripts/tuning.gd")
 
 enum Tier {
 	TENANG = 0,

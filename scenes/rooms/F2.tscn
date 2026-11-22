@@ -66,8 +66,9 @@ shape = SubResource("RectangleShape2D_plat_0")
 position = Vector2(260, 185)
 
 [node name="Sprite2D" type="Sprite2D" parent="Penjual"]
-texture_filter = 0
-position = Vector2(0, -22)
+texture_filter = 1
+position = Vector2(0, -39)
+scale = Vector2(0.35, 0.35)
 texture = ExtResource("5_penjual")
 
 [node name="K1Trigger" type="Area2D" parent="."]

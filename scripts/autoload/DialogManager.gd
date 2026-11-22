@@ -163,6 +163,9 @@ func play_k1() -> void:
 	# Terapkan pilihan ke GameState
 	var ctype = selected_choice.get("type", "jujur")
 	var res = gs.apply_choice(ctype) if gs else {}
+	if res.get("loop", false):
+		_trigger_loop_sequence("k1")
+		return
 	
 	# Reaksi penjual
 	for reply in selected_choice.get("reply", []):

@@ -4,6 +4,20 @@
 [ext_resource type="Texture2D" path="res://assets/processed/comic/comic_end_1.png" id="2_e1"]
 [ext_resource type="Texture2D" path="res://assets/processed/comic/comic_end_2.png" id="3_e2"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_comic_frame"]
+bg_color = Color(0.04, 0.03, 0.06, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.96, 0.94, 0.88, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0, 0, 0.85)
+shadow_size = 8
+
 [node name="Ending" type="Control" node_paths=PackedStringArray("panel_1", "panel_2", "text_label", "title_credit", "team_credit")]
 layout_mode = 3
 anchors_preset = 15
@@ -12,8 +26,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_end")
-panel_1 = NodePath("Panel1")
-panel_2 = NodePath("Panel2")
+panel_1 = NodePath("PanelFrame1")
+panel_2 = NodePath("PanelFrame2")
 text_label = NodePath("TextLabel")
 title_credit = NodePath("TitleCredit")
 team_credit = NodePath("TeamCredit")
@@ -27,25 +41,51 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.04, 0.07, 1)
 
-[node name="Panel1" type="TextureRect" parent="."]
+[node name="PanelFrame1" type="Panel" parent="."]
 layout_mode = 0
 offset_left = 220.0
 offset_top = 80.0
 offset_right = 900.0
 offset_bottom = 780.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_comic_frame")
+
+[node name="Panel1" type="TextureRect" parent="PanelFrame1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("2_e1")
 expand_mode = 1
-stretch_mode = 5
+stretch_mode = 6
 
-[node name="Panel2" type="TextureRect" parent="."]
+[node name="PanelFrame2" type="Panel" parent="."]
 layout_mode = 0
 offset_left = 1020.0
 offset_top = 80.0
 offset_right = 1700.0
 offset_bottom = 780.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_comic_frame")
+
+[node name="Panel2" type="TextureRect" parent="PanelFrame2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("3_e2")
 expand_mode = 1
-stretch_mode = 5
+stretch_mode = 6
 
 [node name="TextLabel" type="Label" parent="."]
 layout_mode = 1

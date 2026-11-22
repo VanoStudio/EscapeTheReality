@@ -15,6 +15,8 @@ static func run_all_tests(p_state: Node) -> Dictionary:
 		Callable(M3Test, "test_hud_scene_load"),
 		Callable(M3Test, "test_dialog_box_scene_load"),
 		Callable(M3Test, "test_choice_panel_scene_load"),
+		Callable(M3Test, "test_choice_panel_show_choices"),
+		Callable(M3Test, "test_dialog_box_prompt_choices"),
 		Callable(M3Test, "test_shader_resources"),
 		Callable(M3Test, "test_f4_photo_puzzle_logic"),
 		Callable(M3Test, "test_dialog_manager_cache")
@@ -66,6 +68,37 @@ static func test_choice_panel_scene_load() -> String:
 	var inst = scene.instantiate()
 	if inst == null:
 		return "Failed to instantiate choice_panel.tscn"
+	inst.free()
+	return ""
+
+static func test_choice_panel_show_choices() -> String:
+	var scene = load("res://scenes/ui/choice_panel.tscn") as PackedScene
+	var inst = scene.instantiate()
+	var test_choices = [
+		{"type": "jujur", "text": "Tes jujur"},
+		{"type": "pendam", "text": "Tes pendam"}
+	]
+	# Test with 2 arguments (choices, tier)
+	inst.show_choices(test_choices, 1)
+	if inst.buttons.size() != 2:
+		inst.free()
+		return "Expected 2 buttons created with 2 args"
+	# Test with 3 arguments (choices, limit, tier)
+	inst.show_choices(test_choices, 15.0, 2)
+	if inst.buttons.size() != 2:
+		inst.free()
+		return "Expected 2 buttons created with 3 args"
+	inst.free()
+	return ""
+
+static func test_dialog_box_prompt_choices() -> String:
+	var scene = load("res://scenes/ui/dialog_box.tscn") as PackedScene
+	var inst = scene.instantiate()
+	var test_choices = [
+		{"type": "jujur", "text": "Tes jujur"},
+		{"type": "pendam", "text": "Tes pendam"}
+	]
+	inst.prompt_choices(test_choices, 1)
 	inst.free()
 	return ""
 

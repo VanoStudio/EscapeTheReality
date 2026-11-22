@@ -4,3 +4,5 @@
 *.log
 ESCAPE THE REALITY ASSETS/
 build/
+tests/screenshots/*.png
+tests/screenshots/*.png.import

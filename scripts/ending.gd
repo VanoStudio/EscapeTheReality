@@ -1,7 +1,7 @@
 extends Control
 
-@export var panel_1: TextureRect
-@export var panel_2: TextureRect
+@export var panel_1: Control
+@export var panel_2: Control
 @export var text_label: Label
 @export var title_credit: Label
 @export var team_credit: Label

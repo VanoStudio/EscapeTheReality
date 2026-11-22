@@ -11,10 +11,16 @@ size = Vector2(20, 60)
 size = Vector2(480, 40)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stair"]
-size = Vector2(140, 20)
+size = Vector2(70, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_step"]
+size = Vector2(34, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_landing"]
+size = Vector2(64, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_k2_trigger"]
-size = Vector2(50, 60)
+size = Vector2(80, 120)
 
 [node name="F3" type="Node2D"]
 script = ExtResource("1_f3")
@@ -47,12 +53,94 @@ collision_mask = 0
 shape = SubResource("RectangleShape2D_ground")
 
 [node name="StairPlatform" type="StaticBody2D" parent="."]
-position = Vector2(250, 175)
+position = Vector2(236, 168)
 collision_layer = 1
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StairPlatform"]
 shape = SubResource("RectangleShape2D_stair")
+one_way_collision = true
+
+[node name="StepL1" type="StaticBody2D" parent="."]
+position = Vector2(195, 153)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepL1"]
+shape = SubResource("RectangleShape2D_step")
+one_way_collision = true
+
+[node name="StepL2" type="StaticBody2D" parent="."]
+position = Vector2(162, 138)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepL2"]
+shape = SubResource("RectangleShape2D_step")
+one_way_collision = true
+
+[node name="StepL3" type="StaticBody2D" parent="."]
+position = Vector2(129, 123)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepL3"]
+shape = SubResource("RectangleShape2D_step")
+one_way_collision = true
+
+[node name="StepL4" type="StaticBody2D" parent="."]
+position = Vector2(96, 108)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepL4"]
+shape = SubResource("RectangleShape2D_step")
+one_way_collision = true
+
+[node name="LandingLeft" type="StaticBody2D" parent="."]
+position = Vector2(55, 95)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LandingLeft"]
+shape = SubResource("RectangleShape2D_landing")
+one_way_collision = true
+
+[node name="StepR1" type="StaticBody2D" parent="."]
+position = Vector2(275, 153)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepR1"]
+shape = SubResource("RectangleShape2D_step")
+one_way_collision = true
+
+[node name="StepR2" type="StaticBody2D" parent="."]
+position = Vector2(308, 138)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepR2"]
+shape = SubResource("RectangleShape2D_step")
+one_way_collision = true
+
+[node name="StepR3" type="StaticBody2D" parent="."]
+position = Vector2(341, 123)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepR3"]
+shape = SubResource("RectangleShape2D_step")
+one_way_collision = true
+
+[node name="StepR4" type="StaticBody2D" parent="."]
+position = Vector2(374, 108)
+collision_layer = 1
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StepR4"]
+shape = SubResource("RectangleShape2D_step")
+one_way_collision = true
 
 [node name="ExitRight" type="Area2D" parent="."]
 position = Vector2(470, 170)
@@ -71,7 +159,7 @@ collision_mask = 2
 shape = SubResource("RectangleShape2D_door")
 
 [node name="K2Trigger" type="Area2D" parent="."]
-position = Vector2(240, 160)
+position = Vector2(240, 150)
 collision_layer = 0
 collision_mask = 2
 

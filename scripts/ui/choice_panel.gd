@@ -13,8 +13,15 @@ var is_active: bool = false
 var buttons: Array[Button] = []
 var cached_hud: Node = null
 
+func _get_game_state() -> Node:
+	if is_inside_tree():
+		return get_node_or_null("/root/GameState")
+	elif Engine.get_main_loop() and "root" in Engine.get_main_loop():
+		return Engine.get_main_loop().root.get_node_or_null("GameState")
+	return null
+
 func _get_hud() -> Node:
-	if cached_hud == null:
+	if cached_hud == null and is_inside_tree():
 		cached_hud = get_tree().root.find_child("HUD", true, false)
 	return cached_hud
 
@@ -54,37 +61,51 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("choice_4") and buttons.size() >= 4:
 		buttons[3].emit_signal("pressed")
 
-func show_choices(choices: Array, tier: int) -> void:
-	current_choices = choices.duplicate()
-	# Acak pilihan setiap ronde tampil
-	current_choices.shuffle()
-	
-	# Hapus tombol lama
-	for child in button_container.get_children():
-		child.queue_free()
+func show_choices(choices: Array, arg2: Variant = 0, arg3: Variant = null) -> void:
+	# Bersihkan tombol sebelumnya
+	for b in buttons:
+		b.queue_free()
 	buttons.clear()
 	
-	# Tentukan timer per tier
-	match tier:
-		GameState.Tier.TENANG:
-			time_limit = 0.0
-		GameState.Tier.KESEL:
-			time_limit = 30.0
-		GameState.Tier.HAMPIR_MELEDAK:
-			time_limit = 15.0
-			
-	time_remaining = time_limit
+	var limit: float = 0.0
+	var tier: int = 0
+	
+	if arg3 != null:
+		# Dipanggil dengan 3 argumen: (choices, limit, tier)
+		limit = float(arg2)
+		tier = int(arg3)
+	else:
+		# Dipanggil dengan 2 argumen: (choices, tier)
+		tier = int(arg2)
+		var gs = _get_game_state()
+		if gs and gs.tuning:
+			match tier:
+				0: limit = gs.tuning.timer_tenang
+				1: limit = gs.tuning.timer_kesel
+				2: limit = gs.tuning.timer_hampir_meledak
+				_: limit = 0.0
+		else:
+			match tier:
+				0: limit = 0.0
+				1: limit = 30.0
+				2: limit = 15.0
+				_: limit = 0.0
+	
+	current_choices = choices.duplicate()
+	time_limit = limit
+	time_remaining = limit
+	
 	if timer_bar:
-		timer_bar.visible = time_limit > 0.0
+		timer_bar.visible = limit > 0.0
 		timer_bar.max_value = time_limit
 		timer_bar.value = time_limit
 		
-	# Buat 4 tombol
+	# Buat 4 tombol dengan banner bergaya steampunk
 	for i in range(current_choices.size()):
 		var c = current_choices[i]
 		var btn = Button.new()
 		btn.text = "%d. %s" % [i + 1, c.get("text", "")]
-		btn.custom_minimum_size = Vector2(500, 48)
+		btn.custom_minimum_size = Vector2(650, 56)
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		
@@ -97,10 +118,46 @@ func show_choices(choices: Array, tier: int) -> void:
 		
 	is_active = true
 	visible = true
-	if buttons.size() > 0:
+	if buttons.size() > 0 and is_inside_tree():
 		buttons[0].grab_focus()
 
 func _style_choice_button(btn: Button, ctype: String, tier: int) -> void:
+	var tex_normal = load("res://assets/processed/ui/choice_banner.png")
+	var tex_hover = load("res://assets/processed/ui/choice_banner_hover.png")
+	
+	if tex_normal:
+		var style_n = StyleBoxTexture.new()
+		style_n.texture = tex_normal
+		style_n.texture_margin_left = 32
+		style_n.texture_margin_right = 32
+		style_n.texture_margin_top = 16
+		style_n.texture_margin_bottom = 16
+		style_n.content_margin_left = 36
+		style_n.content_margin_right = 36
+		style_n.content_margin_top = 8
+		style_n.content_margin_bottom = 8
+		btn.add_theme_stylebox_override("normal", style_n)
+		
+	if tex_hover:
+		var style_h = StyleBoxTexture.new()
+		style_h.texture = tex_hover
+		style_h.texture_margin_left = 32
+		style_h.texture_margin_right = 32
+		style_h.texture_margin_top = 16
+		style_h.texture_margin_bottom = 16
+		style_h.content_margin_left = 36
+		style_h.content_margin_right = 36
+		style_h.content_margin_top = 8
+		style_h.content_margin_bottom = 8
+		btn.add_theme_stylebox_override("hover", style_h)
+		btn.add_theme_stylebox_override("focus", style_h)
+		btn.add_theme_stylebox_override("pressed", style_h)
+
+	btn.add_theme_color_override("font_color", Color(0.18, 0.14, 0.12, 1.0))
+	btn.add_theme_color_override("font_hover_color", Color(0.55, 0.15, 0.1, 1.0))
+	btn.add_theme_color_override("font_focus_color", Color(0.55, 0.15, 0.1, 1.0))
+	btn.add_theme_font_size_override("font_size", 17)
+
 	match tier:
 		GameState.Tier.TENANG:
 			btn.modulate = Color(1, 1, 1, 1)

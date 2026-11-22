@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/processed/rooms/bg_f5.png" id="2_bg"]
 [ext_resource type="PackedScene" path="res://scenes/actors/kirana.tscn" id="3_kirana"]
 [ext_resource type="Script" path="res://scripts/rooms/event_trigger.gd" id="4_trigger"]
-[ext_resource type="Texture2D" path="res://assets/processed/characters/bayangan.png" id="5_bayangan"]
+[ext_resource type="Texture2D" path="res://assets/processed/characters/kirana_rumah.png" id="5_bayangan"]
 [ext_resource type="Shader" path="res://shaders/shadow_character.gdshader" id="6_shader"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_bayangan"]
@@ -63,9 +63,10 @@ shape = SubResource("RectangleShape2D_plat_0")
 position = Vector2(180, 185)
 
 [node name="Sprite2D" type="Sprite2D" parent="Bayangan"]
-texture_filter = 0
+texture_filter = 1
 material = SubResource("ShaderMaterial_bayangan")
-position = Vector2(0, -22)
+position = Vector2(0, -39)
+scale = Vector2(0.35, 0.35)
 texture = ExtResource("5_bayangan")
 
 [node name="K3Trigger" type="Area2D" parent="."]

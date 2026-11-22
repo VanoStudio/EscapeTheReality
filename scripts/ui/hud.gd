@@ -70,6 +70,7 @@ func update_hud() -> void:
 		stability_label.text = str(stab) + "%"
 		
 	_update_watch_texture(tier)
+	_update_tier_colors(tier)
 	_update_tint_effect(tier)
 	
 	if watch_icon:
@@ -83,6 +84,20 @@ func update_hud() -> void:
 			scrap_label.text = "Sobekan Foto: %d/3" % gs.photo_scraps
 		else:
 			scrap_label.visible = false
+
+func _update_tier_colors(tier: int) -> void:
+	if stability_bar:
+		var fill_style = stability_bar.get_theme_stylebox("fill")
+		if fill_style and fill_style is StyleBoxFlat:
+			var flat = fill_style.duplicate() as StyleBoxFlat
+			match tier:
+				0: # TENANG
+					flat.bg_color = Color(0.2, 0.75, 0.7, 1.0)
+				1: # KESEL
+					flat.bg_color = Color(0.92, 0.55, 0.2, 1.0)
+				2: # HAMPIR_MELEDAK
+					flat.bg_color = Color(0.85, 0.22, 0.22, 1.0)
+			stability_bar.add_theme_stylebox_override("fill", flat)
 
 func _update_watch_texture(tier: int) -> void:
 	var ar = _get_asset_registry()
@@ -135,4 +150,4 @@ func set_timer_display(remaining: float, is_active: bool) -> void:
 	if timer_label:
 		timer_label.visible = is_active
 		if is_active:
-			timer_label.text = "%02d:%02d" % [int(remaining) / 60, int(remaining) % 60]
+			timer_label.text = "%02d:%02d" % [int(remaining / 60.0), int(remaining) % 60]

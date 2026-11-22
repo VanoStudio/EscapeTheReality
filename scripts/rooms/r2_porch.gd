@@ -35,7 +35,7 @@ func _setup_watch_interaction() -> void:
 func _process(delta: float) -> void:
 	if watch_sprite:
 		watch_pulse += delta * 4.0
-		var s = 1.0 + sin(watch_pulse) * 0.15
+		var s = 0.028 * (1.0 + sin(watch_pulse) * 0.15)
 		watch_sprite.scale = Vector2(s, s)
 
 func _on_watch_picked() -> void:

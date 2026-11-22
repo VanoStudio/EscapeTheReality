@@ -13,10 +13,14 @@ var is_player_in_range: bool = false
 var has_interacted: bool = false
 var hint_sprite: Sprite2D = null
 var interaction_cooldown: float = 0.0
+var bob_time: float = 0.0
 
 func _process(delta: float) -> void:
 	if interaction_cooldown > 0.0:
 		interaction_cooldown -= delta
+	if is_player_in_range and hint_sprite and hint_sprite.visible:
+		bob_time += delta * 5.0
+		hint_sprite.position.y = -26.0 + sin(bob_time) * 2.5
 
 func _ready() -> void:
 	collision_layer = 0
