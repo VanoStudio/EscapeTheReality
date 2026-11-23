@@ -6,3 +6,4 @@ ESCAPE THE REALITY ASSETS/
 build/
 tests/screenshots/*.png
 tests/screenshots/*.png.import
+tools/_preview/
