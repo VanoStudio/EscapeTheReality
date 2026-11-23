@@ -13,7 +13,37 @@ func _ready() -> void:
 	_setup_camera()
 	_setup_background()
 	_setup_particles()
+	_setup_room_fx()
 	_connect_doors()
+	if room_id in ["F2", "F3", "F4"]:
+		spawn_bayangan_follower.call_deferred()
+
+func _setup_room_fx() -> void:
+	var fx := RoomFX.new()
+	add_child(fx)
+	fx.setup(self, room_id)
+
+func _find_player() -> Node2D:
+	if is_instance_valid(RoomManager.current_player):
+		return RoomManager.current_player
+	return get_node_or_null("Kirana") as Node2D
+
+func spawn_bayangan_follower(from_pos: Variant = null) -> BayanganFollower:
+	# Bayangan menemani Kirana di dunia fantasi.
+	if has_node("BayanganFollower"):
+		return get_node("BayanganFollower") as BayanganFollower
+	var player := _find_player()
+	if player == null:
+		return null
+	var f := BayanganFollower.new()
+	add_child(f)
+	# Digambar tepat di belakang Kirana.
+	if player.get_parent() == self:
+		move_child(f, player.get_index())
+	f.setup(player)
+	if from_pos is Vector2:
+		f.global_position = from_pos
+	return f
 
 func _setup_particles() -> void:
 	if room_id.begins_with("F"):
@@ -56,9 +86,11 @@ func _setup_background() -> void:
 			# Background asli berukuran 2752x1536
 			# Kita scale agar pas mencakup 480x270 (2752 * (270/1536) = 483.75)
 			var scale_y = 270.0 / float(tex.get_height())
-			background_sprite.scale = Vector2(scale_y, scale_y)
+			# Sedikit lebih besar dari layar supaya tepi tidak terlihat saat parallax kamera.
+			background_sprite.scale = Vector2(scale_y * 1.04, scale_y * 1.02)
 			background_sprite.position = Vector2(240, 135)
 			background_sprite.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+			background_sprite.light_mask = 1 | 2
 
 func _connect_doors() -> void:
 	var exit_r = get_node_or_null("ExitRight") as Area2D

@@ -1,0 +1,207 @@
+{
+  "opening": {
+    "ambience": "night_room",
+    "next": "room:R1",
+    "auto_advance": false,
+    "pages": [
+      {
+        "camera_dist": 18.6,
+        "panels": [
+          {
+            "image": "res://assets/processed/comic/comic_open_1.png",
+            "rect": [
+              0.0,
+              3.074,
+              12.0,
+              5.091
+            ],
+            "from": "left",
+            "effects": [
+              "kenburns"
+            ]
+          },
+          {
+            "image": "res://assets/processed/comic/comic_open_2.png",
+            "rect": [
+              -3.075,
+              -2.696,
+              5.85,
+              5.85
+            ],
+            "from": "top",
+            "balloon": {
+              "text": "Kakak masih mikirin soal itu, kan? Semua orang juga tahu kok.",
+              "uv": [
+                0.035,
+                0.07,
+                0.29,
+                0.4
+              ],
+              "font": "res://assets/processed/fonts/comic_dialog_bold.ttf",
+              "font_size": 32,
+              "color": "#1b1720",
+              "style": "normal"
+            }
+          },
+          {
+            "image": "res://assets/processed/comic/comic_open_3.png",
+            "rect": [
+              3.075,
+              -2.696,
+              5.85,
+              5.85
+            ],
+            "from": "left",
+            "effects": [
+              "tremble",
+              "heartbeat"
+            ]
+          }
+        ]
+      },
+      {
+        "camera_dist": 18.0,
+        "panels": [
+          {
+            "image": "res://assets/processed/comic/comic_open_4.png",
+            "rect": [
+              -3.583,
+              0.0,
+              7.95,
+              10.6
+            ],
+            "from": "impact",
+            "effects": [
+              "flash",
+              "shake_hard"
+            ],
+            "sfx": "impact",
+            "balloon": {
+              "text": "CUKUP! Itu bukan urusanmu!",
+              "uv": [
+                0.06,
+                0.015,
+                0.88,
+                0.2
+              ],
+              "font": "res://assets/processed/fonts/scream.ttf",
+              "font_size": 140,
+              "color": "#1b1720",
+              "accent": "#b3121b",
+              "style": "shout"
+            }
+          },
+          {
+            "image": "res://assets/processed/comic/comic_open_5.png",
+            "rect": [
+              4.125,
+              2.725,
+              6.867,
+              5.15
+            ],
+            "from": "left",
+            "effects": [
+              "silence",
+              "darken"
+            ]
+          },
+          {
+            "image": "res://assets/processed/comic/comic_open_6.png",
+            "rect": [
+              4.125,
+              -2.725,
+              6.867,
+              5.15
+            ],
+            "from": "top",
+            "effects": [
+              "shake_soft",
+              "undarken"
+            ],
+            "sfx": "door_slam"
+          }
+        ]
+      }
+    ]
+  },
+  "ending": {
+    "bgm": "ending_warm",
+    "next": "menu",
+    "auto_advance": true,
+    "pages": [
+      {
+        "camera_dist": 17.4,
+        "panels": [
+          {
+            "image": "res://assets/processed/comic/comic_end_1.png",
+            "rect": [
+              -4.175,
+              0.0,
+              7.95,
+              10.6
+            ],
+            "from": "left",
+            "effects": [
+              "glow_warm",
+              "kenburns"
+            ],
+            "hold": 4.0
+          },
+          {
+            "image": "res://assets/processed/comic/comic_end_2.png",
+            "rect": [
+              4.175,
+              0.0,
+              7.95,
+              10.6
+            ],
+            "from": "left",
+            "effects": [
+              "glow_teal",
+              "tick"
+            ],
+            "hold": 4.0
+          }
+        ]
+      }
+    ],
+    "outro": {
+      "dots": 3,
+      "dots_lit": 1,
+      "lines": [
+        "Hari pertama selesai. Masih ada dua hari lagi."
+      ],
+      "title": "Bersambung",
+      "credits": [
+        [
+          "Escape the Reality",
+          "Prototype Hari 1"
+        ],
+        [
+          "Konsep, cerita, desain karakter, potret dan panel webtoon, aset gambar",
+          "Erina Aprilia"
+        ],
+        [
+          "Programmer Godot, integrasi aset, build",
+          "Stevano Sunuprakoso Sosroraharjo"
+        ],
+        [
+          "Musik (CC0)",
+          "\"Emotional Piano\" oleh Centurion_of_war · \"Small Things\" oleh 3xBlast"
+        ],
+        [
+          "Ambience & efek suara (CC0)",
+          "Wolfgang_ · Tsorthan Grove · bart · Kenney (kenney.nl)"
+        ],
+        [
+          "Dibuat dengan",
+          "Godot Engine 4"
+        ],
+        [
+          "Tugas Akhir",
+          "November 2026"
+        ]
+      ]
+    }
+  }
+}

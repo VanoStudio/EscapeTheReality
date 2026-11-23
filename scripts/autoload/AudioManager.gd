@@ -31,56 +31,128 @@ func _ready() -> void:
 	else:
 		_on_room_changed("R1")
 
+const AUDIO_EXTS := ["ogg", "mp3", "wav"]
+const SFX_POOL_SIZE := 8
+const MAX_VARIANTS := 8
+# Volume (dB) dan variasi pitch per SFX supaya mix enak dan tidak monoton.
+const SFX_MIX := {
+	"footstep": {"db": -14.0, "pitch": 0.08},
+	"jump": {"db": -10.0, "pitch": 0.06},
+	"land": {"db": -9.0, "pitch": 0.06},
+	"text_blip": {"db": -20.0, "pitch": 0.12},
+	"select": {"db": -8.0, "pitch": 0.0},
+	"tick": {"db": -12.0, "pitch": 0.0},
+	"pickup": {"db": -6.0, "pitch": 0.0},
+	"impact": {"db": -2.0, "pitch": 0.0},
+	"door_slam": {"db": -3.0, "pitch": 0.0},
+	"heartbeat": {"db": -2.0, "pitch": 0.0},
+	"rewind": {"db": -6.0, "pitch": 0.0}
+}
+const BGM_DB := -12.0
+const AMBIENCE_DB := {"night_room": -14.0, "fantasy_drone": -16.0}
+
+var sfx_pool: Array[AudioStreamPlayer] = []
+var sfx_pool_idx: int = 0
+
 func _setup_players() -> void:
 	bgm_player = AudioStreamPlayer.new()
 	bgm_player.name = "BGM"
-	bgm_player.volume_db = -8.0
+	bgm_player.volume_db = BGM_DB
 	add_child(bgm_player)
 	
 	ambience_player = AudioStreamPlayer.new()
 	ambience_player.name = "Ambience"
-	ambience_player.volume_db = -10.0
+	ambience_player.volume_db = -14.0
 	add_child(ambience_player)
 	
 	clock_player = AudioStreamPlayer.new()
 	clock_player.name = "ClockTick"
-	clock_player.volume_db = -6.0
+	clock_player.volume_db = -12.0
 	add_child(clock_player)
 	
 	sfx_player = AudioStreamPlayer.new()
 	sfx_player.name = "SFX"
 	sfx_player.volume_db = -4.0
 	add_child(sfx_player)
+	# Pool supaya beberapa SFX bisa bunyi bersamaan (langkah + detak + blip).
+	for i in range(SFX_POOL_SIZE):
+		var pl := AudioStreamPlayer.new()
+		pl.name = "SFX%d" % i
+		add_child(pl)
+		sfx_pool.append(pl)
+
+func _find_audio(base: String) -> String:
+	for ext in AUDIO_EXTS:
+		var path := "%s.%s" % [base, ext]
+		if ResourceLoader.exists(path):
+			return path
+	return ""
 
 func get_sfx_stream(sfx_name: String) -> AudioStream:
 	if sfx_cache.has(sfx_name):
 		return sfx_cache[sfx_name]
-	var path = "res://assets/audio/sfx/%s.wav" % sfx_name
-	if ResourceLoader.exists(path):
-		var st = load(path) as AudioStream
+	var st: AudioStream = null
+	var single := _find_audio("res://assets/audio/sfx/%s" % sfx_name)
+	if single != "":
+		st = load(single) as AudioStream
+	else:
+		# Variasi: footstep_1.ogg, footstep_2.ogg, ... -> diacak tiap diputar.
+		var rnd := AudioStreamRandomizer.new()
+		rnd.random_pitch = 1.0
+		for i in range(1, MAX_VARIANTS + 1):
+			var vp := _find_audio("res://assets/audio/sfx/%s_%d" % [sfx_name, i])
+			if vp == "":
+				break
+			rnd.add_stream(-1, load(vp) as AudioStream)
+		if rnd.streams_count > 0:
+			st = rnd
+	if st:
 		sfx_cache[sfx_name] = st
-		return st
-	return null
+	return st
+
+func _loop_stream(st: AudioStream) -> AudioStream:
+	if st is AudioStreamOggVorbis:
+		(st as AudioStreamOggVorbis).loop = true
+	elif st is AudioStreamMP3:
+		(st as AudioStreamMP3).loop = true
+	elif st is AudioStreamWAV:
+		(st as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+	return st
+
+func _crossfade(player: AudioStreamPlayer, st: AudioStream, target_db: float) -> void:
+	if player.stream == st and player.playing:
+		return
+	if player.playing:
+		var out := create_tween()
+		out.tween_property(player, "volume_db", -40.0, 0.6)
+		await out.finished
+	player.stream = st
+	player.volume_db = -40.0
+	player.play()
+	create_tween().tween_property(player, "volume_db", target_db, 1.2)
 
 func play_ambience(track_name: String) -> void:
-	var path = "res://assets/audio/ambience/%s.wav" % track_name
-	if ResourceLoader.exists(path):
-		var st = load(path) as AudioStream
-		if ambience_player.stream != st:
-			ambience_player.stream = st
-			ambience_player.play()
+	var path := _find_audio("res://assets/audio/ambience/%s" % track_name)
+	if path != "":
+		var st := _loop_stream(load(path) as AudioStream)
+		_crossfade(ambience_player, st, float(AMBIENCE_DB.get(track_name, -14.0)))
 
 func play_bgm(track_name: String) -> void:
-	var path = "res://assets/audio/music/%s.wav" % track_name
-	if ResourceLoader.exists(path):
-		var st = load(path) as AudioStream
-		if bgm_player.stream != st:
-			bgm_player.stream = st
-			bgm_player.play()
+	var path := _find_audio("res://assets/audio/music/%s" % track_name)
+	if path != "":
+		var st := _loop_stream(load(path) as AudioStream)
+		_crossfade(bgm_player, st, BGM_DB)
+
+func play_music(track_name: String) -> void:
+	play_bgm(track_name)
 
 func stop_bgm() -> void:
 	if bgm_player.playing:
+		var t := create_tween()
+		t.tween_property(bgm_player, "volume_db", -40.0, 0.8)
+		await t.finished
 		bgm_player.stop()
+		bgm_player.stream = null
 
 func _process(delta: float) -> void:
 	if not is_clock_active:
@@ -103,8 +175,14 @@ func play_tick() -> void:
 func play_sfx(sfx_name: String) -> void:
 	var st = get_sfx_stream(sfx_name)
 	if st:
-		sfx_player.stream = st
-		sfx_player.play()
+		var pl: AudioStreamPlayer = sfx_pool[sfx_pool_idx]
+		sfx_pool_idx = (sfx_pool_idx + 1) % sfx_pool.size()
+		var mix: Dictionary = SFX_MIX.get(sfx_name, {"db": -6.0, "pitch": 0.0})
+		pl.stream = st
+		pl.volume_db = float(mix["db"])
+		var pv := float(mix["pitch"])
+		pl.pitch_scale = 1.0 + randf_range(-pv, pv)
+		pl.play()
 	else:
 		match sfx_name:
 			"jump":

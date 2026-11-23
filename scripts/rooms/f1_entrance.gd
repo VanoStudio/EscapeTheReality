@@ -27,6 +27,7 @@ func _setup_tutorial() -> void:
 	if tutorial_hint:
 		tutorial_hint.text = "[Spasi / W] Lompat"
 		tutorial_hint.modulate.a = 0.0
+		tutorial_hint.z_index = 40
 
 func _on_dialog_event_finished(event_id: String) -> void:
 	if event_id == "prolog":
@@ -35,8 +36,9 @@ func _on_dialog_event_finished(event_id: String) -> void:
 			var tween = create_tween()
 			tween.tween_property(tutorial_hint, "modulate:a", 1.0, 0.5)
 			
-		# Bayangan menunjukkan jalan (fade out perlahan)
+		# Bayangan berhenti diam dan mulai menemani Kirana.
 		if has_node("Bayangan"):
 			var b = get_node("Bayangan") as Node2D
+			spawn_bayangan_follower(b.global_position)
 			var tween_b = create_tween()
-			tween_b.tween_property(b, "modulate:a", 0.3, 1.2)
+			tween_b.tween_property(b, "modulate:a", 0.0, 0.6)

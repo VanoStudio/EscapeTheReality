@@ -1,0 +1,347 @@
+{
+  "_info": "Efek suasana per ruangan (fase C 2.5D). Koordinat dalam satuan dunia 480x270. ambient = warna CanvasModulate.",
+  "R1": {
+    "ambient": [
+      0.82,
+      0.74,
+      0.66
+    ],
+    "lights": [
+      {
+        "pos": [
+          141,
+          118
+        ],
+        "color": [
+          1.0,
+          0.78,
+          0.45
+        ],
+        "energy": 0.7,
+        "radius": 110,
+        "flicker": 0.03
+      },
+      {
+        "pos": [
+          450,
+          95
+        ],
+        "color": [
+          0.55,
+          0.65,
+          1.0
+        ],
+        "energy": 0.45,
+        "radius": 110,
+        "flicker": 0.0
+      }
+    ],
+    "motes": {
+      "color": [
+        1.0,
+        0.88,
+        0.65,
+        0.35
+      ],
+      "amount": 14
+    },
+    "shards": false
+  },
+  "R2": {
+    "ambient": [
+      0.55,
+      0.6,
+      0.82
+    ],
+    "lights": [
+      {
+        "pos": [
+          70,
+          48
+        ],
+        "color": [
+          1.0,
+          0.85,
+          0.55
+        ],
+        "energy": 1.2,
+        "radius": 130,
+        "flicker": 0.05
+      },
+      {
+        "pos": [
+          345,
+          106
+        ],
+        "color": [
+          1.0,
+          0.78,
+          0.45
+        ],
+        "energy": 0.9,
+        "radius": 90,
+        "flicker": 0.0
+      },
+      {
+        "pos": [
+          404,
+          95
+        ],
+        "color": [
+          1.0,
+          0.8,
+          0.5
+        ],
+        "energy": 0.7,
+        "radius": 60,
+        "flicker": 0.04
+      }
+    ],
+    "motes": {
+      "color": [
+        0.75,
+        0.85,
+        1.0,
+        0.3
+      ],
+      "amount": 10
+    },
+    "shards": false
+  },
+  "F1": {
+    "ambient": [
+      0.72,
+      0.68,
+      0.88
+    ],
+    "lights": [
+      {
+        "pos": [
+          119,
+          95
+        ],
+        "color": [
+          1.0,
+          0.75,
+          0.45
+        ],
+        "energy": 0.8,
+        "radius": 90,
+        "flicker": 0.06
+      },
+      {
+        "pos": [
+          238,
+          100
+        ],
+        "color": [
+          0.75,
+          0.95,
+          1.0
+        ],
+        "energy": 1.3,
+        "radius": 120,
+        "flicker": 0.02
+      }
+    ],
+    "motes": {
+      "color": [
+        0.7,
+        0.9,
+        1.0,
+        0.45
+      ],
+      "amount": 22
+    },
+    "shards": true
+  },
+  "F2": {
+    "ambient": [
+      0.74,
+      0.72,
+      0.86
+    ],
+    "lights": [
+      {
+        "pos": [
+          152,
+          73
+        ],
+        "color": [
+          1.0,
+          0.72,
+          0.38
+        ],
+        "energy": 0.9,
+        "radius": 110,
+        "flicker": 0.07
+      },
+      {
+        "pos": [
+          323,
+          73
+        ],
+        "color": [
+          1.0,
+          0.72,
+          0.38
+        ],
+        "energy": 0.9,
+        "radius": 110,
+        "flicker": 0.07
+      }
+    ],
+    "motes": {
+      "color": [
+        1.0,
+        0.85,
+        0.6,
+        0.4
+      ],
+      "amount": 18
+    },
+    "shards": true
+  },
+  "F3": {
+    "ambient": [
+      0.68,
+      0.66,
+      0.9
+    ],
+    "lights": [
+      {
+        "pos": [
+          90,
+          68
+        ],
+        "color": [
+          0.8,
+          0.85,
+          1.0
+        ],
+        "energy": 0.8,
+        "radius": 100,
+        "flicker": 0.0
+      },
+      {
+        "pos": [
+          410,
+          139
+        ],
+        "color": [
+          0.4,
+          1.0,
+          0.92
+        ],
+        "energy": 0.9,
+        "radius": 70,
+        "flicker": 0.1
+      }
+    ],
+    "motes": {
+      "color": [
+        0.75,
+        0.8,
+        1.0,
+        0.45
+      ],
+      "amount": 26
+    },
+    "shards": true
+  },
+  "F4": {
+    "ambient": [
+      0.62,
+      0.66,
+      0.88
+    ],
+    "lights": [
+      {
+        "pos": [
+          109,
+          68
+        ],
+        "color": [
+          0.75,
+          0.88,
+          1.0
+        ],
+        "energy": 1.2,
+        "radius": 130,
+        "flicker": 0.03
+      },
+      {
+        "pos": [
+          390,
+          165
+        ],
+        "color": [
+          1.0,
+          0.55,
+          0.75
+        ],
+        "energy": 0.8,
+        "radius": 55,
+        "flicker": 0.12
+      }
+    ],
+    "motes": {
+      "color": [
+        0.75,
+        0.85,
+        1.0,
+        0.4
+      ],
+      "amount": 22
+    },
+    "shards": true
+  },
+  "F5": {
+    "ambient": [
+      0.6,
+      0.58,
+      0.78
+    ],
+    "lights": [
+      {
+        "pos": [
+          143,
+          112
+        ],
+        "color": [
+          1.0,
+          0.75,
+          0.5
+        ],
+        "energy": 0.7,
+        "radius": 100,
+        "flicker": 0.0
+      },
+      {
+        "pos": [
+          240,
+          60
+        ],
+        "color": [
+          0.65,
+          0.7,
+          1.0
+        ],
+        "energy": 0.5,
+        "radius": 200,
+        "flicker": 0.0
+      }
+    ],
+    "motes": {
+      "color": [
+        0.85,
+        0.85,
+        1.0,
+        0.35
+      ],
+      "amount": 16,
+      "frozen": true
+    },
+    "shards": true
+  }
+}
