@@ -1,5 +1,5 @@
 class_name R2Porch
-extends LayeredRoom
+extends BaseRoom
 
 @export var watch_node: Area2D
 @export var flash_overlay: ColorRect
@@ -33,7 +33,6 @@ func _setup_watch_interaction() -> void:
 			watch_node.interacted.connect(_on_watch_picked)
 
 func _process(delta: float) -> void:
-	super._process(delta)
 	if watch_sprite:
 		watch_pulse += delta * 4.0
 		var s = 0.028 * (1.0 + sin(watch_pulse) * 0.15)

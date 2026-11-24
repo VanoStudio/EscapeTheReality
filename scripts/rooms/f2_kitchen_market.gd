@@ -1,5 +1,5 @@
 class_name F2KitchenMarket
-extends LayeredRoom
+extends BaseRoom
 
 @export var penjual_sprite: Sprite2D
 @export var locked_door_indicator: Node2D

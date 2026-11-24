@@ -1,5 +1,5 @@
 class_name F3Staircase
-extends LayeredRoom
+extends BaseRoom
 
 @export var k2_trigger_zone: Area2D
 var k2_round: int = 1

@@ -1,5 +1,5 @@
 class_name F5Memory
-extends LayeredRoom
+extends BaseRoom
 
 @export var bayangan_node: Node2D
 @export var bayangan_sprite: Sprite2D
