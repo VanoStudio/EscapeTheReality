@@ -1,5 +1,5 @@
 class_name F1Entrance
-extends BaseRoom
+extends LayeredRoom
 
 @export var bayangan_sprite: Sprite2D
 @export var tutorial_hint: Label

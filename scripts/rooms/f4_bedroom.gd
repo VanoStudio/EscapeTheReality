@@ -1,5 +1,5 @@
 class_name F4Bedroom
-extends BaseRoom
+extends LayeredRoom
 
 @export var frame_sprite: Sprite2D
 @export var scrap_nodes: Array[Node2D] = []

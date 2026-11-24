@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/actors/kirana.tscn" id="3_kirana"]
 [ext_resource type="Script" path="res://scripts/rooms/interactable_object.gd" id="4_interact"]
 [ext_resource type="Texture2D" path="res://assets/processed/props/ground_watch.png" id="5_watch"]
+[ext_resource type="SpriteFrames" path="res://assets/processed/characters/kirana_rumah/kirana_rumah_frames.tres" id="6_frames_rumah"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
 size = Vector2(20, 60)
@@ -67,3 +68,6 @@ shape = SubResource("CircleShape2D_watch")
 
 [node name="Kirana" parent="." instance=ExtResource("3_kirana")]
 position = Vector2(40, 215)
+
+[node name="AnimatedSprite2D" parent="Kirana" index="0"]
+sprite_frames = ExtResource("6_frames_rumah")
