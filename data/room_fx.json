@@ -45,7 +45,9 @@
       ],
       "amount": 14
     },
-    "shards": false
+    "shards": false,
+    "walk_y": 215,
+    "floor_fade": 0.55
   },
   "R2": {
     "ambient": [
@@ -106,7 +108,9 @@
       ],
       "amount": 10
     },
-    "shards": false
+    "shards": false,
+    "walk_y": 215,
+    "floor_fade": 0.5
   },
   "F1": {
     "ambient": [
@@ -153,7 +157,9 @@
       ],
       "amount": 22
     },
-    "shards": true
+    "shards": true,
+    "walk_y": 175,
+    "floor_fade": 0.4
   },
   "F2": {
     "ambient": [
@@ -200,7 +206,9 @@
       ],
       "amount": 18
     },
-    "shards": true
+    "shards": true,
+    "walk_y": 185,
+    "floor_fade": 0.4
   },
   "F3": {
     "ambient": [
@@ -247,7 +255,9 @@
       ],
       "amount": 26
     },
-    "shards": true
+    "shards": true,
+    "walk_y": 190,
+    "floor_fade": 0.4
   },
   "F4": {
     "ambient": [
@@ -294,7 +304,9 @@
       ],
       "amount": 22
     },
-    "shards": true
+    "shards": true,
+    "walk_y": 185,
+    "floor_fade": 0.35
   },
   "F5": {
     "ambient": [
@@ -342,6 +354,8 @@
       "amount": 16,
       "frozen": true
     },
-    "shards": true
+    "shards": true,
+    "walk_y": 185,
+    "floor_fade": 0.45
   }
 }

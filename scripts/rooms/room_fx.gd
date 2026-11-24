@@ -75,6 +75,7 @@ func setup(room_node: Node2D, room_id: String) -> void:
 	foreground.z_index = 30
 	room.add_child.call_deferred(foreground)
 	_build_motes()
+	_build_floor_fade()
 	if bool(cfg.get("shards", false)):
 		_build_shards()
 
@@ -98,6 +99,34 @@ func _build_lights() -> void:
 		pl.blend_mode = Light2D.BLEND_MODE_ADD
 		add_child(pl)
 		lights.append({"node": pl, "energy": pl.energy, "flicker": float(l.get("flicker", 0.0)), "seed": randf() * 10.0})
+
+func _build_floor_fade() -> void:
+	# Lantai di depan garis jalan diredupkan bertahap: mata fokus ke jalur karakter,
+	# lantai perspektif yang lebar tidak lagi terasa kosong / "melayang".
+	var strength := float(cfg.get("floor_fade", 0.0))
+	if strength <= 0.0 or not cfg.has("walk_y"):
+		return
+	var top := float(cfg["walk_y"]) + 3.0
+	var g := Gradient.new()
+	g.set_color(0, Color(0.03, 0.02, 0.06, 0.0))
+	g.set_color(1, Color(0.03, 0.02, 0.06, strength))
+	var gt := GradientTexture2D.new()
+	gt.gradient = g
+	gt.fill_from = Vector2(0, 0)
+	gt.fill_to = Vector2(0, 1)
+	gt.width = 8
+	gt.height = 64
+	var spr := Sprite2D.new()
+	spr.name = "FloorFade"
+	spr.texture = gt
+	spr.centered = false
+	spr.position = Vector2(-30, top)
+	spr.scale = Vector2(540.0 / 8.0, (290.0 - top) / 64.0)
+	spr.z_index = 20
+	var mat := CanvasItemMaterial.new()
+	mat.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
+	spr.material = mat
+	add_child(spr)
 
 func _build_motes() -> void:
 	var m: Dictionary = cfg.get("motes", {})

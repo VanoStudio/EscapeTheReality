@@ -1,83 +1,83 @@
-[gd_scene load_steps=12 format=3 uid="uid://2grgixh33w8o"]
+[gd_scene format=3 uid="uid://2grgixh33w8o"]
 
-[ext_resource type="Script" path="res://scripts/rooms/f5_memory.gd" id="1_f5"]
-[ext_resource type="Texture2D" path="res://assets/processed/rooms/bg_f5.png" id="2_bg"]
-[ext_resource type="PackedScene" path="res://scenes/actors/kirana.tscn" id="3_kirana"]
-[ext_resource type="Script" path="res://scripts/rooms/event_trigger.gd" id="4_trigger"]
-[ext_resource type="Texture2D" path="res://assets/processed/characters/kirana_fantasi/individual_frames/idle/frame_01.png" id="5_bayangan"]
-[ext_resource type="Shader" path="res://shaders/shadow_character.gdshader" id="6_shader"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_bayangan"]
-shader = ExtResource("6_shader")
+[ext_resource type="Script" uid="uid://sqa8ei04jr5l" path="res://scripts/rooms/f5_memory.gd" id="1_f5"]
+[ext_resource type="Texture2D" uid="uid://dqhfn28w83twk" path="res://assets/processed/rooms/bg_f5.png" id="2_bg"]
+[ext_resource type="PackedScene" uid="uid://cntq1417alu7l" path="res://scenes/actors/kirana.tscn" id="3_kirana"]
+[ext_resource type="Script" uid="uid://ds77a5lqemg4i" path="res://scripts/rooms/event_trigger.gd" id="4_trigger"]
+[ext_resource type="Texture2D" uid="uid://dx7imsbhnn6nk" path="res://assets/processed/characters/kirana_fantasi/individual_frames/idle/frame_01.png" id="5_bayangan"]
+[ext_resource type="Shader" uid="uid://15e0cju2cdvn" path="res://shaders/shadow_character.gdshader" id="6_shader"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
 size = Vector2(20, 60)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
-size = Vector2(50, 60)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_0"]
 size = Vector2(480, 40)
 
-[node name="F5" type="Node2D" node_paths=PackedStringArray("bayangan_node", "bayangan_sprite")]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bayangan"]
+shader = ExtResource("6_shader")
+shader_parameter/shadow_tint = Color(0.12, 0.08, 0.22, 1)
+shader_parameter/shadow_factor = 0.85
+shader_parameter/glow_color = Color(0.4, 0.2, 0.7, 0.6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
+size = Vector2(50, 60)
+
+[node name="F5" type="Node2D" unique_id=310375443 node_paths=PackedStringArray("bayangan_node", "bayangan_sprite")]
 script = ExtResource("1_f5")
 bayangan_node = NodePath("Bayangan")
 bayangan_sprite = NodePath("Bayangan/Sprite2D")
 room_id = "F5"
-next_room_id = ""
-prev_room_id = ""
 
-[node name="Background" type="Sprite2D" parent="."]
+[node name="Background" type="Sprite2D" parent="." unique_id=1368413992]
 texture_filter = 1
 position = Vector2(240, 135)
 scale = Vector2(0.175781, 0.175781)
 texture = ExtResource("2_bg")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=926223860]
 position = Vector2(240, 135)
 zoom = Vector2(4, 4)
 
-[node name="SpawnLeft" type="Marker2D" parent="."]
+[node name="SpawnLeft" type="Marker2D" parent="." unique_id=963056343]
 position = Vector2(40, 185)
 
-[node name="SpawnRight" type="Marker2D" parent="."]
+[node name="SpawnRight" type="Marker2D" parent="." unique_id=962077780]
 position = Vector2(440, 185)
 
-[node name="ExitRight" type="Area2D" parent="."]
+[node name="ExitRight" type="Area2D" parent="." unique_id=1453728539]
 position = Vector2(470, 165)
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitRight"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitRight" unique_id=1003225583]
 shape = SubResource("RectangleShape2D_door")
 
-[node name="Platform_0" type="StaticBody2D" parent="."]
+[node name="Platform_0" type="StaticBody2D" parent="." unique_id=1494684786]
 position = Vector2(240, 205)
-collision_layer = 1
 collision_mask = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform_0"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform_0" unique_id=1181020648]
 shape = SubResource("RectangleShape2D_plat_0")
 
-[node name="Bayangan" type="Node2D" parent="."]
+[node name="Bayangan" type="Node2D" parent="." unique_id=1922243290]
 position = Vector2(180, 185)
 
-[node name="Sprite2D" type="Sprite2D" parent="Bayangan"]
+[node name="Sprite2D" type="Sprite2D" parent="Bayangan" unique_id=1319704059]
 texture_filter = 1
 material = SubResource("ShaderMaterial_bayangan")
 position = Vector2(0, -39)
 scale = Vector2(0.35, 0.35)
 texture = ExtResource("5_bayangan")
 
-[node name="K3Trigger" type="Area2D" parent="."]
+[node name="K3Trigger" type="Area2D" parent="." unique_id=264745459]
 position = Vector2(90, 175)
 collision_layer = 0
 collision_mask = 2
 script = ExtResource("4_trigger")
 event_name = "k3"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="K3Trigger"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="K3Trigger" unique_id=1505153238]
 shape = SubResource("RectangleShape2D_trigger")
 
-[node name="Kirana" parent="." instance=ExtResource("3_kirana")]
+[node name="Kirana" parent="." unique_id=1285675616 instance=ExtResource("3_kirana")]
 position = Vector2(40, 185)

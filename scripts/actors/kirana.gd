@@ -54,6 +54,7 @@ func _ready() -> void:
 		
 	_build_dust()
 	_build_jam_light()
+	_build_contact_shadow()
 	RoomManager.register_player(self)
 	var gs = get_node_or_null("/root/GameState")
 	if gs and not gs.tier_changed.is_connected(_on_tier_changed):
@@ -84,6 +85,38 @@ func _build_dust() -> void:
 	dust.color_ramp = ramp
 	dust.local_coords = false
 	add_child(dust)
+
+var contact_shadow: Sprite2D = null
+const SHADOW_SIZE := Vector2(38, 9)
+
+func _build_contact_shadow() -> void:
+	# Bayangan lonjong di lantai: mengikat karakter ke garis jalan supaya tidak terlihat melayang.
+	contact_shadow = Sprite2D.new()
+	contact_shadow.name = "ContactShadow"
+	contact_shadow.texture = RoomFX.dot_texture()
+	contact_shadow.top_level = true
+	contact_shadow.z_index = -1
+	contact_shadow.modulate = Color(0.02, 0.01, 0.05, 0.55)
+	add_child(contact_shadow)
+	_update_contact_shadow()
+
+func _update_contact_shadow() -> void:
+	if contact_shadow == null or not is_inside_tree():
+		return
+	var space := get_world_2d().direct_space_state
+	var q := PhysicsRayQueryParameters2D.create(global_position + Vector2(0, -2), global_position + Vector2(0, 160), 1)
+	q.exclude = [get_rid()]
+	var hit := space.intersect_ray(q)
+	if hit.is_empty():
+		contact_shadow.visible = false
+		return
+	contact_shadow.visible = true
+	var ground_y: float = hit["position"].y
+	var height: float = max(ground_y - global_position.y, 0.0)
+	var k: float = clamp(1.0 - height / 120.0, 0.35, 1.0)
+	contact_shadow.global_position = Vector2(global_position.x, ground_y)
+	contact_shadow.scale = SHADOW_SIZE * k / 32.0
+	contact_shadow.modulate.a = 0.7 * k
 
 func _puff(amount: int) -> void:
 	if dust == null:
@@ -168,6 +201,7 @@ func _physics_process(delta: float) -> void:
 		if not is_on_floor():
 			velocity.y += gravity * delta
 		move_and_slide()
+		_update_contact_shadow()
 		return
 
 	# Gravity
@@ -248,3 +282,4 @@ func _physics_process(delta: float) -> void:
 				_play_anim("fall")
 
 	move_and_slide()
+	_update_contact_shadow()

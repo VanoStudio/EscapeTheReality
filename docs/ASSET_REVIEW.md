@@ -10,6 +10,26 @@ Urutan di bawah sudah diurutkan dari yang paling berpengaruh ke tampilan game.
 3. **Background transparan yang bersih.** Jangan pakai latar magenta/hijau kalau bisa. Kalau terpaksa, pastikan tidak ada pinggiran warna yang tersisa (lihat poin B1).
 4. **Garis tepi (outline) dan palet sama** antara Kirana rumah, Kirana fantasi, dan penjual.
 
+## A0. Background yang merusak feel jalan karakter (PALING PENTING)
+
+**Masalah:** beberapa background digambar dengan sudut pandang 3/4 (lantai terlihat dari atas dan dalam, seperti diorama), sedangkan karakter adalah side-view yang berjalan di satu garis lurus. Akibatnya jalur jalan terasa aneh, karakter terlihat "ditempel" atau melayang, dan lantai bawah kosong.
+
+| Ruangan | Kondisi | Perlu dibuat ulang? |
+|---|---|---|
+| F4 Kamar | Lantai pecah-pecah, Kirana berjalan di atas kehampaan | **Ya, wajib** |
+| R1 Ruang tamu | Lantai perspektif makan ±30% layar bawah, kosong | **Ya** |
+| R2 Teras | Lantai teras dan halaman perspektif miring | **Ya** |
+| F2 Pasar dapur | Pulau lantai oke; panci di tepi kiri/kanan menutupi titik masuk | Sebaiknya (geser panci ke dalam) |
+| F3 Tangga | Tangga 3D diagonal hanya dekorasi, lantai jalan oke | Tidak wajib |
+| F1, F5 | Sudah cukup pas | Tidak |
+
+**Spesifikasi background baru (side-view):**
+- Kamera lurus dari samping, setinggi dada karakter (bukan dari atas). Dinding tampak depan, **lantai hanya berupa strip tipis**.
+- Ukuran tetap 2752×1536. **Garis jalan (atas lantai) di y ≈ 1050–1080 px** dari atas gambar (= y 185–190 di dunia 480×270). Strip lantai di bawahnya maksimal ±250 px, sisanya boleh gelap/kehampaan.
+- Tepi kiri dan kanan (±340 px dari tiap tepi) **bebas dari perabot setinggi badan**, karena itu titik masuk dan keluar Kirana.
+- Perabot yang dipakai sebagai pijakan (rak, pecahan lantai F4) dibuat **sprite terpisah**, jangan menyatu di background.
+- Ukuran piksel sama dengan background sekarang (1 piksel seni ≈ 1 piksel dunia).
+
 ## A. Prioritas tinggi
 
 ### A1. Sprite Kirana versi rumah — `characters/kirana_rumah*.png`
