@@ -6,6 +6,10 @@ extends LayeredRoom
 @export var lamp_position: Vector2 = Vector2(148, 117)
 
 func _build_extras() -> void:
+	# RoomFX (data/room_fx.json) sudah memasang CanvasModulate, lampu, dan debu.
+	# Jangan dobel: dua CanvasModulate di satu canvas saling menimpa.
+	if has_node("RoomFX"):
+		return
 	_build_light()
 	_build_dust()
 

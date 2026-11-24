@@ -48,8 +48,13 @@ func _apply_kirana_scale() -> void:
 	var spr := _kirana.get_node_or_null("AnimatedSprite2D") as CanvasItem
 	if spr:
 		var s: float = KIRANA_BASE_SCALE * 4.0 / cam_zoom
+		# Offset sprite ikut diskalakan supaya kaki tetap menapak di garis jalan.
+		if spr is Node2D:
+			(spr as Node2D).position *= s / KIRANA_BASE_SCALE
 		spr.scale = Vector2(s, s)
 		spr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		if "base_scale" in _kirana:
+			_kirana.base_scale = spr.scale
 
 # --- kamera ----------------------------------------------------------------
 

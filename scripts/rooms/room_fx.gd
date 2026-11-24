@@ -211,7 +211,13 @@ func _process(delta: float) -> void:
 		node.position = sh["base"] + Vector2(0, sin(t * 0.6 + sh["phase"]) * 2.0)
 		node.rotation = sh["rot"] + sin(t * 0.4 + sh["phase"]) * 0.04
 
+func _layers_own_camera() -> bool:
+	# LayeredRoom (lapisan Parallax2D + kamera ikut pemain) sudah mengatur kamera dan parallax.
+	return room != null and "layers_active" in room and bool(room.layers_active)
+
 func _update_parallax(delta: float) -> void:
+	if _layers_own_camera():
+		return
 	var rm = get_node_or_null("/root/RoomManager")
 	var target := Vector2.ZERO
 	if rm and is_instance_valid(rm.current_player):
