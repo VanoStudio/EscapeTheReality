@@ -172,16 +172,16 @@ func play_tick() -> void:
 	else:
 		_play_synthetic_beep(800.0, 0.03, clock_player)
 
-func play_sfx(sfx_name: String) -> void:
+func play_sfx(sfx_name: String, pitch_mul: float = 1.0, db_offset: float = 0.0) -> void:
 	var st = get_sfx_stream(sfx_name)
 	if st:
 		var pl: AudioStreamPlayer = sfx_pool[sfx_pool_idx]
 		sfx_pool_idx = (sfx_pool_idx + 1) % sfx_pool.size()
 		var mix: Dictionary = SFX_MIX.get(sfx_name, {"db": -6.0, "pitch": 0.0})
 		pl.stream = st
-		pl.volume_db = float(mix["db"])
+		pl.volume_db = float(mix["db"]) + db_offset
 		var pv := float(mix["pitch"])
-		pl.pitch_scale = 1.0 + randf_range(-pv, pv)
+		pl.pitch_scale = (1.0 + randf_range(-pv, pv)) * pitch_mul
 		pl.play()
 	else:
 		match sfx_name:

@@ -93,7 +93,7 @@ static func test_comic_data_matches_gdd() -> String:
 	var d = JSON.parse_string(FileAccess.open("res://data/comic.json", FileAccess.READ).get_as_text())
 	if not (d is Dictionary):
 		return "comic.json invalid"
-	var counts := {"opening": 6, "ending": 2}
+	var counts := {"opening": 13, "ending": 2}
 	var texts: Array = []
 	for cid in counts.keys():
 		var n := 0
@@ -104,11 +104,29 @@ static func test_comic_data_matches_gdd() -> String:
 					return "missing image " + panel["image"]
 				if panel.has("balloon"):
 					texts.append(panel["balloon"]["text"])
+				for b in panel.get("balloons", []):
+					texts.append(b["text"])
+				# Tulisan SFX tambahan wajib ditandai draft (bukan teks naskah).
+				for sx in panel.get("sfx_text", []):
+					if not sx.get("draft", false):
+						return "sfx_text without draft flag: " + str(sx.get("text", ""))
 		if n != counts[cid]:
 			return "%s panel count %d != %d" % [cid, n, counts[cid]]
-	# Teks persis GDD bagian 3 (opening panel 2 dan 4).
-	if texts != ["Kakak masih mikirin soal itu, kan? Semua orang juga tahu kok.", "CUKUP! Itu bukan urusanmu!"]:
-		return "balloon text differs from GDD: " + str(texts)
+	# Teks persis naskah opening webtoon (urutan cerita, dialog beat 2/5/8 dipecah 2 bubble).
+	var expected := [
+		"Kak? Kenapa sih?",
+		"Kayak nggak ada kehidupan banget. Cerita aja.",
+		"Iya, gapapa kok. Aman ini mah.",
+		"Lah, gimana sih? Aku bisa jadi pendengar kakak, loh.",
+		"Pantes aja kamu ngerasa kayak gitu.",
+		"Hancur banget hidupmu, Kak.",
+		"Lah, apaan sih? Kamu tuh nggak usah ngatur hidupku!",
+		"Ini tuh masalah sepele juga!",
+		"Kamu nggak usah segitunya lah!",
+		"Lah, nggak jelas banget. Gitu aja nangis."
+	]
+	if texts != expected:
+		return "balloon text differs from script: " + str(texts)
 	var outro: Dictionary = d["ending"]["outro"]
 	if outro["lines"] != ["Hari pertama selesai. Masih ada dua hari lagi."] or outro["title"] != "Bersambung":
 		return "ending text differs from GDD"
