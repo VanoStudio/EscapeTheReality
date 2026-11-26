@@ -67,7 +67,10 @@ func update_hud() -> void:
 		var bar_tween = create_tween()
 		bar_tween.tween_property(stability_bar, "value", float(stab), 0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	if stability_label:
-		stability_label.text = str(stab) + "%"
+		if rm and rm.current_room_id == "P1":
+			stability_label.text = "Energi %d" % stab
+		else:
+			stability_label.text = str(stab) + "%"
 		
 	_update_watch_texture(tier)
 	_update_tier_colors(tier)
@@ -82,6 +85,9 @@ func update_hud() -> void:
 		if rm and rm.current_room_id == "F4":
 			scrap_label.visible = true
 			scrap_label.text = "Sobekan Foto: %d/3" % gs.photo_scraps
+		elif rm and rm.current_room_id == "P1":
+			scrap_label.visible = true
+			scrap_label.text = "Pecahan: %d/%d" % [gs.papers.size(), gs.PAPERS_TOTAL]
 		else:
 			scrap_label.visible = false
 
@@ -151,3 +157,63 @@ func set_timer_display(remaining: float, is_active: bool) -> void:
 		timer_label.visible = is_active
 		if is_active:
 			timer_label.text = "%02d:%02d" % [int(remaining / 60.0), int(remaining) % 60]
+
+# ---------------------------------------------------------------- petunjuk kontrol
+
+var hint_panel: PanelContainer = null
+var hint_label: Label = null
+var hint_tween: Tween = null
+var hint_token: int = 0
+
+func _ensure_hint() -> void:
+	if hint_panel:
+		return
+	hint_panel = PanelContainer.new()
+	hint_panel.name = "HintPanel"
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.06, 0.05, 0.1, 0.78)
+	sb.set_corner_radius_all(18)
+	sb.border_color = Color(1.0, 0.86, 0.6, 0.55)
+	sb.set_border_width_all(2)
+	sb.content_margin_left = 28
+	sb.content_margin_right = 28
+	sb.content_margin_top = 10
+	sb.content_margin_bottom = 12
+	hint_panel.add_theme_stylebox_override("panel", sb)
+	hint_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hint_label = Label.new()
+	hint_label.add_theme_font_size_override("font_size", 30)
+	hint_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.86))
+	var bold_path := "res://assets/processed/fonts/comic_dialog_bold.ttf"
+	if ResourceLoader.exists(bold_path):
+		hint_label.add_theme_font_override("font", load(bold_path) as Font)
+	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint_panel.add_child(hint_label)
+	add_child(hint_panel)
+	hint_panel.modulate.a = 0.0
+
+## Petunjuk kontrol di layar (bukan di dunia), selalu tajam. dur <= 0 = tetap sampai hide_hint().
+func show_hint(text: String, dur: float = 4.0) -> void:
+	_ensure_hint()
+	hint_token += 1
+	var token := hint_token
+	hint_label.text = text
+	hint_panel.reset_size()
+	await get_tree().process_frame
+	hint_panel.position = Vector2((1920.0 - hint_panel.size.x) * 0.5, 1080.0 - hint_panel.size.y - 120.0)
+	if hint_tween and hint_tween.is_valid():
+		hint_tween.kill()
+	hint_tween = create_tween()
+	hint_tween.tween_property(hint_panel, "modulate:a", 1.0, 0.3)
+	if dur > 0.0:
+		await get_tree().create_timer(dur).timeout
+		if token == hint_token:
+			hide_hint()
+
+func hide_hint() -> void:
+	if hint_panel == null:
+		return
+	if hint_tween and hint_tween.is_valid():
+		hint_tween.kill()
+	hint_tween = create_tween()
+	hint_tween.tween_property(hint_panel, "modulate:a", 0.0, 0.3)

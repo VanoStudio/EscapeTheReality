@@ -1,0 +1,286 @@
+{
+  "_info": "Flow Kirana (FLOW KIRANA.pdf). Teks tanpa draft = persis PDF. draft:true = tulisan sementara, menunggu naskah pemilik.",
+  "front_house": {
+    "lapar": {
+      "speaker": "kakak",
+      "text": "duh laper banget.. kenapa sih ada aja masalah dirumah tuh?"
+    },
+    "jendela": {
+      "speaker": "kakak",
+      "text": "haduh keluar cari makan, pulang lagi males!"
+    },
+    "jam": {
+      "speaker": "kakak",
+      "text": "lho itu jam apa?"
+    },
+    "aah": {
+      "speaker": "kakak",
+      "text": "AAH!!!!"
+    }
+  },
+  "arrival": {
+    "shout": {
+      "speaker": "kakak",
+      "text": "AAHHH! Ini dimana sih?!!?"
+    },
+    "lines": [
+      {
+        "speaker": "bayangan",
+        "text": "Hai. Akhirnya ya? Ketemu juga."
+      },
+      {
+        "speaker": "kakak",
+        "text": "kamu siapa? disini ada makanan gak sih? aku lapar!"
+      },
+      {
+        "speaker": "bayangan",
+        "text": "kamu ini ya, memang sering banget nahan lapar."
+      },
+      {
+        "speaker": "bayangan",
+        "text": "Ikuti aku, masuk saja pintu bercahaya di belakangku ini"
+      }
+    ]
+  },
+  "mbok_luna": {
+    "intro": [
+      {
+        "speaker": "penjual",
+        "text": "Lho... akhirnya kamu datang juga, Nak. Tumben sekali sampai kemari."
+      },
+      {
+        "speaker": "kakak",
+        "text": "Aku baru pertama kali di sini... kok kamu bisa kenal aku?"
+      },
+      {
+        "speaker": "penjual",
+        "text": "Pertama kali? Hmm... mungkin bagi kamu begitu. Tapi bagi Mbok, bayanganmu sudah sering kemari. Duduk diam, melamun, lalu pergi sebelum sempat Mbok sapa."
+      },
+      {
+        "speaker": "kakak",
+        "text": "Bayanganku...?"
+      },
+      {
+        "speaker": "penjual",
+        "text": "Iya. Mbok sering melihatmu dari jauh."
+      },
+      {
+        "speaker": "kakak",
+        "text": "Hmm... aneh."
+      },
+      {
+        "speaker": "penjual",
+        "text": "Hehe... sudahlah. Kamu sudah jauh-jauh datang, mau Mbok siapkan makanan?"
+      }
+    ],
+    "choices": [
+      {
+        "type": "mau",
+        "text": "Boleh... kalau nggak merepotkan.",
+        "reply": [
+          {
+            "speaker": "penjual",
+            "text": "Tidak merepotkan sama sekali. Makanlah dulu sebelum melanjutkan perjalanan."
+          },
+          {
+            "speaker": "kakak",
+            "text": "Terima kasih, Mbok."
+          },
+          {
+            "speaker": "penjual",
+            "text": "Habiskan. Siapa tahu nanti kamu membutuhkannya."
+          },
+          {
+            "speaker": "kakak",
+            "text": "Memangnya aku mau ke mana?"
+          },
+          {
+            "speaker": "penjual",
+            "text": "Ke tempat yang sudah lama menunggumu, Nak."
+          },
+          {
+            "speaker": "kakak",
+            "text": "...Tempat apa?"
+          },
+          {
+            "speaker": "penjual",
+            "text": "Nanti juga kamu akan tahu."
+          }
+        ]
+      },
+      {
+        "type": "tidak",
+        "text": "Enggak usah, Mbok. Aku nggak lapar.",
+        "reply": [
+          {
+            "speaker": "penjual",
+            "text": "Baiklah... kalau begitu, jangan memaksakan diri."
+          },
+          {
+            "speaker": "kakak",
+            "text": "Memangnya kenapa?"
+          },
+          {
+            "speaker": "penjual",
+            "text": "Tidak apa-apa, Nak. Hanya saja... kalau nanti kakimu terasa berat, jangan heran."
+          },
+          {
+            "speaker": "kakak",
+            "text": "Maksud Mbok?"
+          },
+          {
+            "speaker": "penjual",
+            "text": "Tidak semua perjalanan bisa ditempuh dengan tenaga yang sama."
+          }
+        ]
+      }
+    ]
+  },
+  "mission": {
+    "draft": true,
+    "lines": [
+      {
+        "speaker": "kakak",
+        "text": "Maksud Mbok Luna tadi apa, sih?",
+        "draft": true
+      },
+      {
+        "speaker": "bayangan",
+        "text": "Di atas sana ada empat lembar kertas yang tercecer. Kumpulkan semuanya, nanti kamu ngerti sendiri.",
+        "draft": true
+      },
+      {
+        "speaker": "bayangan",
+        "text": "Aku bisa membuka portal. Masuk, aku ikut di belakangmu.",
+        "draft": true
+      }
+    ]
+  },
+  "parkour": {
+    "heavy": {
+      "speaker": "kakak",
+      "text": "Kakiku... kok berat banget, ya?",
+      "draft": true
+    },
+    "trauma_warn": {
+      "speaker": "bayangan",
+      "text": "Jangan sentuh bagian yang gelap. Isinya semua yang kamu pendam.",
+      "draft": true
+    },
+    "merge_tutorial": {
+      "speaker": "bayangan",
+      "text": "Batu itu nggak bisa kamu geser sendirian. Tahan Q, biar kita menyatu.",
+      "draft": true
+    },
+    "collapse": {
+      "speaker": "bayangan",
+      "text": "Tenagamu habis... kita istirahat dulu di tempat Mbok Luna.",
+      "draft": true
+    },
+    "portal_incomplete": {
+      "speaker": "bayangan",
+      "text": "Kertasnya belum lengkap.",
+      "draft": true
+    },
+    "portal_complete": {
+      "speaker": "kakak",
+      "text": "Semuanya sudah lengkap.",
+      "draft": true
+    },
+    "papers": [
+      {
+        "speaker": "kakak",
+        "text": "Ini... foto kita sekeluarga. Tangan Ayah di bahuku.",
+        "draft": true
+      },
+      {
+        "speaker": "kakak",
+        "text": "Ibu... sama Adik. Dia senyum lebar banget di sini.",
+        "draft": true
+      },
+      {
+        "speaker": "kakak",
+        "text": "Tas ini... yang tadi aku bawa waktu kabur dari rumah.",
+        "draft": true
+      },
+      {
+        "speaker": "kakak",
+        "text": "Adik... padahal dia cuma mau dengerin aku.",
+        "draft": true
+      }
+    ],
+    "trauma_echoes": [
+      {
+        "speaker": "adik",
+        "text": "Hancur banget hidupmu, Kak."
+      },
+      {
+        "speaker": "adik",
+        "text": "Pantes aja kamu ngerasa kayak gitu."
+      },
+      {
+        "speaker": "adik",
+        "text": "Lah, nggak jelas banget. Gitu aja nangis."
+      },
+      {
+        "speaker": "adik",
+        "text": "Lah, gimana sih? Aku bisa jadi pendengar kakak, loh."
+      }
+    ],
+    "finale": {
+      "speaker": "kakak",
+      "text": "Foto kita... utuh lagi kalau disatukan.",
+      "draft": true
+    },
+    "assist": {
+      "speaker": "bayangan",
+      "text": "Pelan-pelan. Pijak yang ungu, aku bantu.",
+      "draft": true
+    }
+  },
+  "mbok_wake": {
+    "lines": [
+      {
+        "speaker": "penjual",
+        "text": "Nah, sudah bangun. Tadi kamu pingsan di depan warung Mbok.",
+        "draft": true
+      },
+      {
+        "speaker": "penjual",
+        "text": "Sudah Mbok bilang, jangan memaksakan diri.",
+        "draft": true
+      }
+    ],
+    "offer": {
+      "speaker": "penjual",
+      "text": "Makan dulu, ya? Biar kakimu kuat lagi.",
+      "draft": true
+    },
+    "reply_mau": [
+      {
+        "speaker": "penjual",
+        "text": "Nah, begitu. Habiskan.",
+        "draft": true
+      }
+    ],
+    "reply_tidak": [
+      {
+        "speaker": "penjual",
+        "text": "Ya sudah... hati-hati, Nak.",
+        "draft": true
+      }
+    ],
+    "rested": [
+      {
+        "speaker": "penjual",
+        "text": "Istirahat sebentar sudah cukup. Hati-hati di atas sana.",
+        "draft": true
+      }
+    ],
+    "shadow": {
+      "speaker": "bayangan",
+      "text": "Ayo, kita coba lagi. Pecahan yang sudah kamu dapat masih ada.",
+      "draft": true
+    }
+  }
+}

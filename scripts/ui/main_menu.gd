@@ -59,6 +59,9 @@ func _on_start_pressed() -> void:
 	var am = get_node_or_null("/root/AudioManager")
 	if am:
 		am.play_sfx("select")
+	var gs = get_node_or_null("/root/GameState")
+	if gs and gs.has_method("reset_state"):
+		gs.reset_state()
 	get_tree().change_scene_to_file("res://scenes/opening.tscn")
 
 func _on_settings_pressed() -> void:

@@ -1,8 +1,23 @@
-[gd_scene load_steps=5 format=3 uid="uid://cg2u1wcdo2oas"]
+[gd_scene load_steps=7 format=3 uid="uid://cg2u1wcdo2oas"]
 
 [ext_resource type="Script" path="res://scripts/ui/dialog_box.gd" id="1_dlg"]
 [ext_resource type="PackedScene" path="res://scenes/ui/choice_panel.tscn" id="2_choice"]
 [ext_resource type="Texture2D" path="res://assets/processed/ui/dialog_frame_clean.png" id="3_frame"]
+[ext_resource type="FontFile" path="res://assets/processed/fonts/comic_dialog_bold.ttf" id="4_bold"]
+[ext_resource type="FontFile" path="res://assets/processed/fonts/comic_dialog.ttf" id="5_reg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_name"]
+bg_color = Color(0.2, 0.13, 0.08, 0.92)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+content_margin_left = 22.0
+content_margin_right = 22.0
+content_margin_top = 4.0
+content_margin_bottom = 6.0
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 6
 
 [node name="DialogBox" type="CanvasLayer" node_paths=PackedStringArray("portrait_rect", "speaker_label", "text_label", "next_indicator", "choice_panel")]
 layer = 20
@@ -23,10 +38,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -780.0
-offset_top = -280.0
-offset_right = 780.0
-offset_bottom = -25.0
+offset_left = -830.0
+offset_top = -330.0
+offset_right = 830.0
+offset_bottom = -28.0
 grow_horizontal = 2
 grow_vertical = 0
 
@@ -44,36 +59,40 @@ stretch_mode = 6
 [node name="PortraitRect" type="TextureRect" parent="BoxContainer"]
 texture_filter = 1
 layout_mode = 0
-offset_left = 40.0
-offset_top = -90.0
-offset_right = 290.0
-offset_bottom = 230.0
+offset_left = 34.0
+offset_top = -70.0
+offset_right = 314.0
+offset_bottom = 278.0
 expand_mode = 1
 stretch_mode = 5
 
 [node name="SpeakerLabel" type="Label" parent="BoxContainer"]
 layout_mode = 0
-offset_left = 295.0
-offset_top = 28.0
-offset_right = 670.0
-offset_bottom = 60.0
-theme_override_colors/font_color = Color(0.38, 0.24, 0.1, 1)
-theme_override_colors/font_shadow_color = Color(0.9, 0.85, 0.75, 0.6)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 22
+offset_left = 336.0
+offset_top = -26.0
+offset_right = 760.0
+offset_bottom = 34.0
+theme_override_colors/font_color = Color(1, 0.9, 0.72, 1)
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBox_name")
 text = "NAMA TOKOH"
 
 [node name="TextLabel" type="RichTextLabel" parent="BoxContainer"]
 layout_mode = 0
-offset_left = 295.0
-offset_top = 68.0
-offset_right = 1420.0
-offset_bottom = 205.0
+offset_left = 340.0
+offset_top = 58.0
+offset_right = 1590.0
+offset_bottom = 250.0
 theme_override_colors/default_color = Color(0.12, 0.1, 0.14, 1)
-theme_override_font_sizes/normal_font_size = 20
+theme_override_constants/line_separation = 6
+theme_override_fonts/normal_font = ExtResource("5_reg")
+theme_override_fonts/bold_font = ExtResource("4_bold")
+theme_override_font_sizes/normal_font_size = 36
+theme_override_font_sizes/bold_font_size = 36
 bbcode_enabled = true
 text = "Teks percakapan akan muncul di sini."
+scroll_active = false
 
 [node name="NextIndicator" type="Label" parent="BoxContainer"]
 visible = false
@@ -83,12 +102,14 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -260.0
-offset_top = -45.0
-offset_right = -70.0
-offset_bottom = -20.0
+offset_left = -470.0
+offset_top = -84.0
+offset_right = -130.0
+offset_bottom = -46.0
 grow_horizontal = 0
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.45, 0.32, 0.15, 0.9)
-theme_override_font_sizes/font_size = 15
-text = "[E / Enter] Lanjut ▶"
+theme_override_colors/font_color = Color(0.45, 0.3, 0.12, 0.95)
+theme_override_fonts/font = ExtResource("4_bold")
+theme_override_font_sizes/font_size = 24
+text = "E / Enter  lanjut ▶"
+horizontal_alignment = 2

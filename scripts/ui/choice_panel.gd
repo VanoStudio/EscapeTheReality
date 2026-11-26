@@ -105,7 +105,7 @@ func show_choices(choices: Array, arg2: Variant = 0, arg3: Variant = null) -> vo
 		var c = current_choices[i]
 		var btn = Button.new()
 		btn.text = "%d. %s" % [i + 1, c.get("text", "")]
-		btn.custom_minimum_size = Vector2(650, 56)
+		btn.custom_minimum_size = Vector2(780, 78)
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		
@@ -132,10 +132,10 @@ func _style_choice_button(btn: Button, ctype: String, tier: int) -> void:
 		style_n.texture_margin_right = 32
 		style_n.texture_margin_top = 16
 		style_n.texture_margin_bottom = 16
-		style_n.content_margin_left = 36
+		style_n.content_margin_left = 66
 		style_n.content_margin_right = 36
-		style_n.content_margin_top = 8
-		style_n.content_margin_bottom = 8
+		style_n.content_margin_top = 12
+		style_n.content_margin_bottom = 12
 		btn.add_theme_stylebox_override("normal", style_n)
 		
 	if tex_hover:
@@ -145,10 +145,10 @@ func _style_choice_button(btn: Button, ctype: String, tier: int) -> void:
 		style_h.texture_margin_right = 32
 		style_h.texture_margin_top = 16
 		style_h.texture_margin_bottom = 16
-		style_h.content_margin_left = 36
+		style_h.content_margin_left = 66
 		style_h.content_margin_right = 36
-		style_h.content_margin_top = 8
-		style_h.content_margin_bottom = 8
+		style_h.content_margin_top = 12
+		style_h.content_margin_bottom = 12
 		btn.add_theme_stylebox_override("hover", style_h)
 		btn.add_theme_stylebox_override("focus", style_h)
 		btn.add_theme_stylebox_override("pressed", style_h)
@@ -156,7 +156,10 @@ func _style_choice_button(btn: Button, ctype: String, tier: int) -> void:
 	btn.add_theme_color_override("font_color", Color(0.18, 0.14, 0.12, 1.0))
 	btn.add_theme_color_override("font_hover_color", Color(0.55, 0.15, 0.1, 1.0))
 	btn.add_theme_color_override("font_focus_color", Color(0.55, 0.15, 0.1, 1.0))
-	btn.add_theme_font_size_override("font_size", 17)
+	btn.add_theme_font_size_override("font_size", 30)
+	var bold_path := "res://assets/processed/fonts/comic_dialog_bold.ttf"
+	if ResourceLoader.exists(bold_path):
+		btn.add_theme_font_override("font", load(bold_path) as Font)
 
 	match tier:
 		GameState.Tier.TENANG:

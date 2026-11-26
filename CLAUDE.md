@@ -36,3 +36,13 @@ Kakak hanya bisa pulang jika berhenti memendam dan berani jujur mengakui perasaa
 - **M2**: AssetRegistry placeholder system, player movement, 7 rooms, RoomManager, camera, CLI debug args.
 - **M3**: DialogBox, ChoicePanel, event triggers, loop & rewind, tier visuals, puzzle foto F4, bot autoplay.
 - **M4**: Motion comic opening & ending, main & pause menu, AudioManager, Windows export preset, final verification.
+
+## Flow Kirana (rombak, FLOW KIRANA.pdf)
+- Alur: opening comic -> `R2` depan rumah (jam muncul, tekan E) -> `F1` rumah dunia lain (portal kanan, Bayangan) -> `F2` pasar Mbok Luna (pilihan makan) -> `P1` menara parkour (4 kertas, zona trauma, menyatu Q) -> ending comic.
+- Naskah: `data/dialog/flow.json` (teks tanpa `draft` = persis PDF). Tata letak parkour: `scripts/rooms/p1_layout.gd`.
+- Tidak makan = `GameState.has_heavy_legs()` (lompat 0.9x, jalan 0.88x). Layout P1 dicek bisa dilompati di profil ini.
+- Angka keseimbangan parkour (fisika, energi, damage, heal, bantuan): `scripts/rooms/p1_layout.gd`. Jangkauan lompatan dites di `tests/m5_test.gd`.
+- Energi 0 di P1 -> bangun di F2 (Mbok Luna) lalu portal kembali ke tingkat pecahan berikutnya (pecahan tetap tersimpan).
+- Aset: `tools/process_photo_and_sprite.py` (4 pecahan foto + sprite Kirana rumah dari zip), `tools/process_flow_assets.py` (latar, portal, pulau).
+- Debug CLI: `--room=<id>`, `--pos=x,y` dan `--shot_delay=<detik>` (dipakai bersama `--shot=`), `--autotest` (R2/F2/P1), `--autotest_collapse` (P1 -> F2), `--debug_papers=N` (P1).
+- R1, F3, F4, F5, K2, K3 tidak lagi di jalur utama (file disimpan).

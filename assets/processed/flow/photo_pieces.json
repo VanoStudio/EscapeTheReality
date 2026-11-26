@@ -1,0 +1,56 @@
+{
+  "size": [
+    896,
+    1200
+  ],
+  "pieces": [
+    {
+      "file": "photo_piece_1.png",
+      "pos": [
+        18,
+        2
+      ],
+      "size": [
+        435,
+        606
+      ]
+    },
+    {
+      "file": "photo_piece_2.png",
+      "pos": [
+        448,
+        22
+      ],
+      "size": [
+        428,
+        585
+      ]
+    },
+    {
+      "file": "photo_piece_3.png",
+      "pos": [
+        17,
+        607
+      ],
+      "size": [
+        431,
+        573
+      ]
+    },
+    {
+      "file": "photo_piece_4.png",
+      "pos": [
+        444,
+        604
+      ],
+      "size": [
+        435,
+        574
+      ]
+    }
+  ],
+  "full_offset": [
+    17,
+    2
+  ]
+}

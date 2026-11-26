@@ -20,6 +20,14 @@ var current_event_id: String = ""
 var photo_scraps: int = 0
 var visited_bomb_events: Dictionary = {}
 
+# Flow Kirana (rombak): makan di Mbok Luna, kertas parkour, checkpoint.
+const PAPERS_TOTAL := 4
+var ate_food: bool = true
+var food_answered: bool = false
+var papers: Array[int] = []
+var parkour_started: bool = false
+var wake_pending: bool = false
+
 func _init() -> void:
 	load_tuning()
 	reset_state()
@@ -40,6 +48,11 @@ func reset_state() -> void:
 	current_event_id = ""
 	photo_scraps = 0
 	visited_bomb_events.clear()
+	ate_food = true
+	food_answered = false
+	papers.clear()
+	parkour_started = false
+	wake_pending = false
 
 func get_tier() -> int:
 	if tuning == null:
@@ -121,3 +134,75 @@ func can_advance_k3(type: String) -> bool:
 func add_photo_scrap() -> int:
 	photo_scraps = mini(photo_scraps + 1, 3)
 	return photo_scraps
+
+# ---------------------------------------------------------------- flow parkour
+
+func set_food_choice(ate: bool) -> void:
+	ate_food = ate
+	food_answered = true
+
+func has_heavy_legs() -> bool:
+	return food_answered and not ate_food
+
+func collect_paper(idx: int) -> int:
+	if not papers.has(idx):
+		papers.append(idx)
+	return papers.size()
+
+func has_all_papers() -> bool:
+	return papers.size() >= PAPERS_TOTAL
+
+# Zona trauma mengurangi stabilitas. Hasil: true kalau stabilitas habis (pemain harus mengulang tingkat).
+func apply_trauma(amount: int) -> bool:
+	var old_tier: int = get_tier()
+	var old: int = stability
+	var lo: int = tuning.stability_min if tuning else 0
+	var hi: int = tuning.stability_max if tuning else 100
+	var collapsed := false
+	var nv: int = stability - amount
+	if nv <= lo:
+		stability = tuning.stability_loop_reset if tuning else 40
+		collapsed = true
+	else:
+		stability = clampi(nv, lo, hi)
+	stability_changed.emit(stability, stability - old)
+	var nt: int = get_tier()
+	if nt != old_tier:
+		tier_changed.emit(nt)
+	return collapsed
+
+func heal(amount: int) -> void:
+	var old_tier: int = get_tier()
+	var old: int = stability
+	stability = clampi(stability + amount, tuning.stability_min if tuning else 0, tuning.stability_max if tuning else 100)
+	stability_changed.emit(stability, stability - old)
+	var nt: int = get_tier()
+	if nt != old_tier:
+		tier_changed.emit(nt)
+
+## Energi parkour berkurang. Hasil: true kalau energi habis (0) -> Kirana pingsan, bangun di Mbok Luna.
+func drain(amount: int) -> bool:
+	var old_tier: int = get_tier()
+	var old: int = stability
+	stability = maxi(stability - amount, 0)
+	stability_changed.emit(stability, stability - old)
+	var nt: int = get_tier()
+	if nt != old_tier:
+		tier_changed.emit(nt)
+	return stability <= 0
+
+func set_energy(value: int) -> void:
+	var old_tier: int = get_tier()
+	var old: int = stability
+	stability = clampi(value, 0, tuning.stability_max if tuning else 100)
+	stability_changed.emit(stability, stability - old)
+	var nt: int = get_tier()
+	if nt != old_tier:
+		tier_changed.emit(nt)
+
+## Kertas pertama yang belum diambil (0..3), 4 = semua lengkap.
+func next_missing_paper() -> int:
+	for i in range(PAPERS_TOTAL):
+		if not papers.has(i):
+			return i
+	return PAPERS_TOTAL

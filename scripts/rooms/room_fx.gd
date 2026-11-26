@@ -216,7 +216,8 @@ func _layers_own_camera() -> bool:
 	return room != null and "layers_active" in room and bool(room.layers_active)
 
 func _update_parallax(delta: float) -> void:
-	if _layers_own_camera():
+	# Ruangan tanpa konfigurasi (mis. P1 parkour) mengatur kameranya sendiri.
+	if cfg.is_empty() or _layers_own_camera():
 		return
 	var rm = get_node_or_null("/root/RoomManager")
 	var target := Vector2.ZERO

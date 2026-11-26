@@ -133,6 +133,15 @@ func _update_speaker(speaker_key: String, expression: String) -> void:
 				
 		portrait_rect.texture = tex
 
+## Pilihan biasa tanpa batas waktu dan tanpa efek tier (mis. tawaran makan Mbok Luna).
+func prompt_simple_choices(choices: Array) -> void:
+	is_waiting_for_choice = true
+	is_waiting_for_input = false
+	if next_indicator:
+		next_indicator.visible = false
+	if choice_panel:
+		choice_panel.show_choices(choices, 0.0, 0)
+
 func prompt_choices(choices: Array, tier: int) -> void:
 	is_waiting_for_choice = true
 	is_waiting_for_input = false

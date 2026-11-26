@@ -217,6 +217,12 @@ func _build_post() -> void:
 	gr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	grade_mat = ShaderMaterial.new()
 	grade_mat.shader = load("res://shaders/comic_grade.gdshader") as Shader
+	# Isi nilai awal: get_shader_parameter() mengembalikan null untuk uniform yang belum pernah diset.
+	grade_mat.set_shader_parameter("tint", Color.WHITE)
+	for k in ["tint_amount", "chroma", "blur_x"]:
+		grade_mat.set_shader_parameter(k, 0.0)
+	for k in ["saturation", "contrast", "brightness"]:
+		grade_mat.set_shader_parameter(k, 1.0)
 	gr.material = grade_mat
 	grade_layer.add_child(gr)
 

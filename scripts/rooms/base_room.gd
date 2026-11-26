@@ -15,7 +15,7 @@ func _ready() -> void:
 	_setup_particles()
 	_setup_room_fx()
 	_connect_doors()
-	if room_id in ["F2", "F3", "F4"]:
+	if room_id in ["F3", "F4"]:
 		spawn_bayangan_follower.call_deferred()
 
 func _setup_room_fx() -> void:

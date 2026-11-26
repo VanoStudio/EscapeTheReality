@@ -13,7 +13,8 @@ const ROOM_SCENES = {
 	"F2": "res://scenes/rooms/F2.tscn",
 	"F3": "res://scenes/rooms/F3.tscn",
 	"F4": "res://scenes/rooms/F4.tscn",
-	"F5": "res://scenes/rooms/F5.tscn"
+	"F5": "res://scenes/rooms/F5.tscn",
+	"P1": "res://scenes/rooms/P1.tscn"
 }
 
 var current_room_id: String = "R1"
@@ -29,6 +30,9 @@ var hud_instance: Node = null
 var pause_instance: Node = null
 var pending_screenshot: String = ""
 var next_spawn_left: bool = true
+# Debug CLI: --shot_delay=<detik> (tunda screenshot), --pos=x,y (taruh Kirana di titik itu).
+var shot_delay: float = 0.0
+var debug_pos := Vector2.INF
 
 func _ready() -> void:
 	_setup_fade_overlay()
@@ -73,6 +77,12 @@ func _parse_cli_arguments() -> void:
 				current_room_id = r
 		elif arg.begins_with("--shot="):
 			pending_screenshot = arg.trim_prefix("--shot=")
+		elif arg.begins_with("--shot_delay="):
+			shot_delay = float(arg.trim_prefix("--shot_delay="))
+		elif arg.begins_with("--pos="):
+			var xy = arg.trim_prefix("--pos=").split(",")
+			if xy.size() == 2:
+				debug_pos = Vector2(float(xy[0]), float(xy[1]))
 
 func _reposition_player() -> void:
 	if is_instance_valid(current_player) and is_instance_valid(current_room_node):
@@ -81,6 +91,8 @@ func _reposition_player() -> void:
 			current_player.global_position = current_room_node.get_node(marker_name).global_position
 
 func register_room(room_node: Node, room_id: String) -> void:
+	if hud_instance:
+		hud_instance.visible = true
 	current_room_node = room_node
 	current_room_id = room_id
 	GameState.current_room = room_id
@@ -97,7 +109,7 @@ func register_player(player_node: CharacterBody2D) -> void:
 	_reposition_player()
 
 func is_fantasy_world() -> bool:
-	return current_room_id.begins_with("F")
+	return current_room_id.begins_with("F") or current_room_id.begins_with("P")
 
 func change_room(target_room_id: String, spawn_at_left: bool = true) -> void:
 	if is_transitioning:
@@ -147,6 +159,12 @@ func change_room(target_room_id: String, spawn_at_left: bool = true) -> void:
 		_save_screenshot(sname)
 
 func _save_screenshot(shot_name: String) -> void:
+	if debug_pos != Vector2.INF and is_instance_valid(current_player):
+		current_player.global_position = debug_pos
+		if current_room_node and current_room_node.has_method("_snap_camera"):
+			current_room_node._snap_camera()
+	if shot_delay > 0.0:
+		await get_tree().create_timer(shot_delay).timeout
 	for i in range(5):
 		await get_tree().process_frame
 	var dir = DirAccess.open("res://")
@@ -158,6 +176,9 @@ func _save_screenshot(shot_name: String) -> void:
 	get_tree().quit(0)
 
 func respawn_player() -> void:
+	if current_player and current_room_node and current_room_node.has_method("on_player_fell"):
+		current_room_node.on_player_fell(current_player)
+		return
 	if current_player and current_room_node:
 		var spawn_pos = Vector2(30, 210)
 		if current_room_node.has_node("SpawnLeft"):
@@ -172,3 +193,23 @@ func handle_f3_loop() -> void:
 		if current_room_node.has_node("SpawnLeft"):
 			left_x = current_room_node.get_node("SpawnLeft").global_position.x
 		current_player.global_position.x = left_x
+
+## Pindah ke scene non-ruangan (mis. ending comic): HUD disembunyikan, layar fade.
+func go_to_scene(scene_path: String) -> void:
+	if is_transitioning:
+		return
+	is_transitioning = true
+	var tween = create_tween()
+	tween.tween_property(fade_overlay, "color:a", 1.0, 0.4)
+	await tween.finished
+	if hud_instance:
+		hud_instance.visible = false
+	current_player = null
+	current_room_node = null
+	get_tree().change_scene_to_file(scene_path)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var tween_in = create_tween()
+	tween_in.tween_property(fade_overlay, "color:a", 0.0, 0.4)
+	await tween_in.finished
+	is_transitioning = false

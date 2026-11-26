@@ -31,6 +31,7 @@ func _load_all_data() -> void:
 		"k3": "res://data/dialog/k3.json",
 		"rooms": "res://data/dialog/rooms.json",
 		"system": "res://data/dialog/system.json",
+		"flow": "res://data/dialog/flow.json",
 		"names": "res://data/names.json"
 	}
 	for k in files.keys():
@@ -371,3 +372,102 @@ func _trigger_loop_sequence(event_id: String) -> void:
 		start_k2_round(1)
 	elif event_id == "k3":
 		start_k3_round(1)
+
+# ---------------------------------------------------------------- flow Kirana (rombak)
+
+const WorldBubbleScript := preload("res://scripts/ui/world_bubble.gd")
+
+## Ambil data flow.json dengan jalur "a/b/c".
+func flow(path: String) -> Variant:
+	var node: Variant = dialog_cache.get("flow", {})
+	for part in path.split("/"):
+		if node is Dictionary and node.has(part):
+			node = node[part]
+		else:
+			return null
+	return node
+
+func is_bot() -> bool:
+	return bot_choice_type != ""
+
+## Percakapan di kotak dialog (pemain dibekukan). lines = [{speaker, text, expression?}].
+func play_lines(lines: Array, event_id: String = "") -> void:
+	if dialog_box == null or lines.is_empty():
+		return
+	is_active = true
+	_freeze_player(true)
+	for item in lines:
+		await _show_one(item)
+	dialog_box.close_dialog()
+	_freeze_player(false)
+	is_active = false
+	if event_id != "":
+		event_finished.emit(event_id)
+
+func _show_one(item: Dictionary) -> void:
+	dialog_box.show_line(String(item.get("speaker", "kakak")), String(item.get("text", "")), String(item.get("expression", "biasa")))
+	if is_bot():
+		await get_tree().create_timer(0.15).timeout
+		dialog_box._finish_typing()
+		await get_tree().create_timer(0.05).timeout
+	else:
+		await dialog_box.line_finished
+
+## Percakapan Mbok Luna + pilihan makan. Hasil: "mau" atau "tidak".
+func play_food_choice() -> String:
+	var data: Dictionary = flow("mbok_luna") if flow("mbok_luna") is Dictionary else {}
+	if dialog_box == null or data.is_empty():
+		return "mau"
+	is_active = true
+	_freeze_player(true)
+	for item in data.get("intro", []):
+		await _show_one(item)
+	var choices: Array = data.get("choices", [])
+	var picked: Dictionary = choices[0] if not choices.is_empty() else {}
+	if choices.size() > 1:
+		if is_bot():
+			picked = choices[1] if bot_choice_type in ["pendam", "tidak"] else choices[0]
+		else:
+			dialog_box.prompt_simple_choices(choices)
+			picked = await dialog_box.choice_resolved
+	var kind := String(picked.get("type", "mau"))
+	# Pilihan diucapkan Kirana, lalu Mbok Luna menjawab.
+	await _show_one({"speaker": "kakak", "text": String(picked.get("text", ""))})
+	var gs = _get_game_state()
+	if gs and gs.has_method("set_food_choice"):
+		gs.set_food_choice(kind == "mau")
+	for item in picked.get("reply", []):
+		await _show_one(item)
+	dialog_box.close_dialog()
+	_freeze_player(false)
+	is_active = false
+	event_finished.emit("mbok_luna")
+	return kind
+
+## Bubble di atas kepala yang tidak menghentikan permainan. entry = {speaker, text}.
+func bubble(who: Node2D, entry: Variant, style: String = "speech", hold: float = -1.0, offset: Vector2 = Vector2(0, -80)) -> Node:
+	if not (entry is Dictionary) or who == null:
+		return null
+	var h := hold
+	if is_bot():
+		h = 0.2
+	return WorldBubbleScript.say(who, String(entry.get("text", "")), style, String(entry.get("speaker", "kakak")), h, offset)
+
+## Satu tawaran + pilihan (mis. Mbok Luna menawarkan makan lagi). Hasil: "type" pilihan.
+func play_offer(offer: Variant, choices: Variant) -> String:
+	if dialog_box == null or not (offer is Dictionary) or not (choices is Array) or choices.is_empty():
+		return ""
+	is_active = true
+	_freeze_player(true)
+	await _show_one(offer)
+	var picked: Dictionary = choices[0]
+	if is_bot():
+		picked = choices[1] if bot_choice_type in ["pendam", "tidak"] and choices.size() > 1 else choices[0]
+	else:
+		dialog_box.prompt_simple_choices(choices)
+		picked = await dialog_box.choice_resolved
+	await _show_one({"speaker": "kakak", "text": String(picked.get("text", ""))})
+	dialog_box.close_dialog()
+	_freeze_player(false)
+	is_active = false
+	return String(picked.get("type", ""))

@@ -7,3 +7,5 @@ build/
 tests/screenshots/*.png
 tests/screenshots/*.png.import
 tools/_preview/
+
+__pycache__/

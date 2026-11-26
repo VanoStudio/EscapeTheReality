@@ -3,6 +3,7 @@ extends SceneTree
 const M1Test = preload("res://tests/m1_test.gd")
 const M3Test = preload("res://tests/m3_test.gd")
 const M4Test = preload("res://tests/m4_test.gd")
+const M5Test = preload("res://tests/m5_test.gd")
 
 func _init() -> void:
 	print("=== RUNNING TEST SUITE ===")
@@ -40,6 +41,11 @@ func _init() -> void:
 	var m4_results: Dictionary = M4Test.run_all_tests()
 	passed += m4_results["passed"]
 	failed += m4_results["failed"]
+
+	# M5: rombak FLOW KIRANA
+	var m5_results: Dictionary = M5Test.run_all_tests()
+	passed += m5_results["passed"]
+	failed += m5_results["failed"]
 	
 	print("=== RESULTS: %d PASSED, %d FAILED ===" % [passed, failed])
 	if failed > 0:

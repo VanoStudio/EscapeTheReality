@@ -1,7 +1,7 @@
 {
   "opening": {
     "ambience": "night_room",
-    "next": "room:R1",
+    "next": "room:R2",
     "auto_advance": true,
     "start_black": true,
     "start_delay": 0.8,

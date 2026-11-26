@@ -1,6 +1,9 @@
 class_name Kirana
 extends CharacterBody2D
 
+## Mendarat setelah di udara. drop = jarak jatuh dari titik tertinggi (px dunia).
+signal landed(drop: float)
+
 @export var anim_sprite: AnimatedSprite2D
 @export var sprite: Sprite2D
 @export var collision_shape: CollisionShape2D
@@ -191,9 +194,105 @@ func _play_anim(anim_type: String) -> void:
 		if anim_sprite.animation != target_anim or not anim_sprite.is_playing():
 			anim_sprite.play(target_anim)
 
+# ---------------------------------------------------------------- profil per ruangan
+
+var body_scale: float = 1.0
+var _base_collision_size := Vector2.ZERO
+var _base_collision_pos := Vector2.ZERO
+var _base_sprite_pos := Vector2.ZERO
+var heavy_legs: bool = false
+
+## Ruang parkour memakai karakter lebih kecil (dunia lebih luas) dan fisika lompat lebih tinggi.
+func set_body_scale(k: float) -> void:
+	var node: Node2D = anim_sprite if anim_sprite else sprite
+	if node == null:
+		return
+	if _base_collision_size == Vector2.ZERO and collision_shape and collision_shape.shape is RectangleShape2D:
+		_base_collision_size = (collision_shape.shape as RectangleShape2D).size
+		_base_collision_pos = collision_shape.position
+		_base_sprite_pos = node.position
+	body_scale = k
+	base_scale = base_scale * (k / maxf(body_scale_prev, 0.001))
+	body_scale_prev = k
+	node.scale = base_scale
+	node.position = _base_sprite_pos * k
+	if collision_shape and _base_collision_size != Vector2.ZERO:
+		var rect := RectangleShape2D.new()
+		rect.size = _base_collision_size * k
+		collision_shape.shape = rect
+		collision_shape.position = _base_collision_pos * k
+	if jam_light:
+		jam_light.position = Vector2(0, -42) * k
+
+var body_scale_prev: float = 1.0
+
+func set_physics_profile(speed: float, jump: float, grav: float) -> void:
+	walk_speed = speed
+	jump_velocity = jump
+	gravity = grav
+	if heavy_legs:
+		_apply_heavy()
+
+## Tidak makan di Mbok Luna: kaki terasa berat (lompat ~12% lebih rendah, jalan lebih pelan).
+func set_heavy_legs(on: bool) -> void:
+	if on == heavy_legs:
+		return
+	heavy_legs = on
+	if on:
+		_apply_heavy()
+	else:
+		walk_speed /= 0.88
+		jump_velocity /= 0.9
+
+func _apply_heavy() -> void:
+	walk_speed *= 0.88
+	jump_velocity *= 0.9
+
+# Rasa lompat ramah (dipakai di parkour): gravitasi lebih ringan di puncak saat tombol ditahan,
+# kecepatan jatuh dibatasi, coyote time & jump buffer lebih panjang.
+var apex_gravity_scale: float = 1.0
+var apex_window: float = 70.0
+var max_fall_speed: float = 100000.0
+var _air_top_y: float = 0.0
+var _knock_timer: float = 0.0
+
+func set_feel(coyote: float, buffer: float, apex_scale: float, max_fall: float) -> void:
+	coyote_time_max = coyote
+	jump_buffer_max = buffer
+	apex_gravity_scale = apex_scale
+	max_fall_speed = max_fall
+
+## Dipakai saat teleport (respawn) supaya tidak dihitung jatuh.
+func reset_air() -> void:
+	_air_top_y = global_position.y
+	fall_speed_peak = 0.0
+
+## Terpental (kena trauma): kontrol dikunci sebentar, tetap kena gravitasi.
+func knockback(v: Vector2, lock: float = 0.3) -> void:
+	velocity = v
+	_knock_timer = lock
+
+func _gravity_step(delta: float) -> void:
+	var g := gravity
+	if apex_gravity_scale < 1.0 and Input.is_action_pressed("jump") and absf(velocity.y) < apex_window:
+		g *= apex_gravity_scale
+	velocity.y = minf(velocity.y + g * delta, max_fall_speed)
+
+func face_left(left: bool) -> void:
+	if anim_sprite:
+		anim_sprite.flip_h = left
+	elif sprite:
+		sprite.flip_h = left
+
+func _kill_y() -> float:
+	var room = RoomManager.current_room_node
+	if is_instance_valid(room) and "kill_y" in room:
+		return float(room.kill_y)
+	return 300.0
+
 func _physics_process(delta: float) -> void:
-	# Void fall check (di luar layar 270 px)
-	if global_position.y > 300.0:
+	# Jatuh ke kehampaan: kembali ke titik respawn ruangan.
+	if global_position.y > _kill_y():
 		RoomManager.respawn_player()
 		return
 		
@@ -201,12 +300,21 @@ func _physics_process(delta: float) -> void:
 		if not is_on_floor():
 			velocity.y += gravity * delta
 		move_and_slide()
+		_track_air()
+		_update_contact_shadow()
+		return
+
+	if _knock_timer > 0.0:
+		_knock_timer -= delta
+		_gravity_step(delta)
+		move_and_slide()
+		_track_air()
 		_update_contact_shadow()
 		return
 
 	# Gravity
 	if not is_on_floor():
-		velocity.y += gravity * delta
+		_gravity_step(delta)
 		coyote_timer -= delta
 		fall_speed_peak = max(fall_speed_peak, velocity.y)
 	else:
@@ -282,4 +390,17 @@ func _physics_process(delta: float) -> void:
 				_play_anim("fall")
 
 	move_and_slide()
+	_track_air()
 	_update_contact_shadow()
+
+var _was_floor_track := true
+
+func _track_air() -> void:
+	if is_on_floor():
+		if not _was_floor_track:
+			landed.emit(global_position.y - _air_top_y)
+		_air_top_y = global_position.y
+		_was_floor_track = true
+	else:
+		_air_top_y = minf(_air_top_y, global_position.y)
+		_was_floor_track = false

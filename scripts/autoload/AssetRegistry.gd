@@ -4,9 +4,9 @@ extends Node
 
 const ROOM_BACKGROUNDS = {
 	"R1": "res://assets/processed/rooms/bg_r1.png",
-	"R2": "res://assets/processed/rooms/bg_r2.png",
-	"F1": "res://assets/processed/rooms/bg_f1.png",
-	"F2": "res://assets/processed/rooms/bg_f2.png",
+	"R2": "res://assets/processed/flow/bg_front_house.jpg",
+	"F1": "res://assets/processed/flow/bg_arrival.jpg",
+	"F2": "res://assets/processed/flow/bg_market.jpg",
 	"F3": "res://assets/processed/rooms/bg_f3.png",
 	"F4": "res://assets/processed/rooms/bg_f4.png",
 	"F5": "res://assets/processed/rooms/bg_f5.png"

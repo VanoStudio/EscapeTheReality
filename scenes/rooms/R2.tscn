@@ -1,73 +1,29 @@
-[gd_scene load_steps=11 format=3 uid="uid://bmf7r3htd2586"]
+[gd_scene load_steps=4 format=3 uid="uid://bmf7r3htd2586"]
 
 [ext_resource type="Script" path="res://scripts/rooms/r2_porch.gd" id="1_r2"]
-[ext_resource type="Texture2D" path="res://assets/processed/rooms/bg_r2.png" id="2_bg"]
 [ext_resource type="PackedScene" path="res://scenes/actors/kirana.tscn" id="3_kirana"]
-[ext_resource type="Script" path="res://scripts/rooms/interactable_object.gd" id="4_interact"]
-[ext_resource type="Texture2D" path="res://assets/processed/props/ground_watch.png" id="5_watch"]
 [ext_resource type="SpriteFrames" path="res://assets/processed/characters/kirana_rumah/kirana_rumah_frames.tres" id="6_frames_rumah"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
-size = Vector2(20, 60)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_watch"]
-radius = 24.0
 
 [node name="R2" type="Node2D"]
 script = ExtResource("1_r2")
 room_id = "R2"
 next_room_id = "F1"
-prev_room_id = "R1"
 
 [node name="Background" type="Sprite2D" parent="."]
-texture_filter = 1
 position = Vector2(240, 135)
-scale = Vector2(0.175781, 0.175781)
-texture = ExtResource("2_bg")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(240, 135)
 zoom = Vector2(4, 4)
 
 [node name="SpawnLeft" type="Marker2D" parent="."]
-position = Vector2(40, 215)
+position = Vector2(58, 217)
 
 [node name="SpawnRight" type="Marker2D" parent="."]
-position = Vector2(440, 195)
-
-[node name="ExitLeft" type="Area2D" parent="."]
-position = Vector2(10, 195)
-collision_layer = 0
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitLeft"]
-shape = SubResource("RectangleShape2D_door")
-
-[node name="Ground" type="StaticBody2D" parent="."]
-collision_layer = 1
-collision_mask = 0
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Ground"]
-polygon = PackedVector2Array(0, 215, 210, 215, 235, 195, 480, 195, 480, 270, 0, 270)
-
-[node name="GroundWatch" type="Area2D" parent="."]
-position = Vector2(330, 190)
-collision_layer = 0
-collision_mask = 2
-script = ExtResource("4_interact")
-trigger_once = true
-
-[node name="WatchSprite" type="Sprite2D" parent="GroundWatch"]
-texture_filter = 1
-position = Vector2(0, -5)
-scale = Vector2(0.028, 0.028)
-texture = ExtResource("5_watch")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundWatch"]
-shape = SubResource("CircleShape2D_watch")
+position = Vector2(420, 217)
 
 [node name="Kirana" parent="." instance=ExtResource("3_kirana")]
-position = Vector2(40, 215)
+position = Vector2(58, 217)
 
 [node name="AnimatedSprite2D" parent="Kirana" index="0"]
 sprite_frames = ExtResource("6_frames_rumah")
