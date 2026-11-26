@@ -19,7 +19,8 @@ static func run_all_tests() -> Dictionary:
 		Callable(M5Test, "test_merge_input_exists"),
 		Callable(M5Test, "test_parkour_jumps_reachable"),
 		Callable(M5Test, "test_energy_drain"),
-		Callable(M5Test, "test_rework2_assets")
+		Callable(M5Test, "test_rework2_assets"),
+		Callable(M5Test, "test_menu_and_credits")
 	]
 	for t in tests:
 		var name: String = t.get_method()
@@ -258,4 +259,18 @@ static func test_rework2_assets() -> String:
 		var tex := load(path) as Texture2D
 		if tex == null or tex.get_width() != 3072 or tex.get_height() != 256:
 			return n + " must be a 3072x256 strip"
+	return ""
+
+static func test_menu_and_credits() -> String:
+	var c = JSON.parse_string(FileAccess.open("res://data/credits.json", FileAccess.READ).get_as_text())
+	if not (c is Dictionary) or c["by"] != "By: ERINA APRILIA & STEVANO SUNUPRAKOSO SOSRORAHARJO" or c["thanks"] != "THANK YOU PAK SEPTIAN & FRIENDS! :3":
+		return "credits.json text differs from owner's text"
+	var d = JSON.parse_string(FileAccess.open("res://data/comic.json", FileAccess.READ).get_as_text())
+	if d["ending"]["outro"].get("credits_scene", "") != "res://scenes/credits.tscn":
+		return "ending must hand off to the credits scene"
+	for f in ["menu_bg.jpg", "menu_swirl.jpg", "menu_bokeh.jpg", "menu_mist.jpg", "menu_frame.png", "menu_kirana.png", "menu_logo.png"]:
+		if not ResourceLoader.exists("res://assets/processed/menu/" + f):
+			return "missing menu layer " + f
+	if not ResourceLoader.exists("res://scenes/credits.tscn"):
+		return "credits scene missing"
 	return ""

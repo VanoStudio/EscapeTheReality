@@ -16,6 +16,7 @@ var light: PointLight2D
 var swirl: CPUParticles2D
 var area: Area2D
 var is_open := false
+var glow_boost := 0.0   # tambahan cahaya (mis. semua pecahan terkumpul)
 var _t := 0.0
 
 func _ready() -> void:
@@ -77,7 +78,7 @@ func _process(delta: float) -> void:
 	if not is_open:
 		return
 	_t += delta
-	light.energy = 0.9 + sin(_t * 3.2) * 0.18
+	light.energy = 0.9 + glow_boost + sin(_t * 3.2) * 0.18
 	sprite.scale.y = abs(sprite.scale.x) * (1.0 + sin(_t * 2.4) * 0.015)
 
 func open(dur: float = 0.7) -> void:

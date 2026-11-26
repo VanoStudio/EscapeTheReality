@@ -52,6 +52,7 @@ var assisted := [false, false, false, false]
 var _aura_t := 0.0
 var _blink_t := 0.0
 var _finale_warned := false
+var _cam_look_until := 0.0
 
 func _ready() -> void:
 	super._ready()
@@ -111,6 +112,8 @@ func _setup_camera() -> void:
 	camera.make_current()
 
 func _cam_target() -> Vector2:
+	if _cam_look_until > 0.0:
+		return L.FINAL_PORTAL + Vector2(0, -40)
 	var k = _find_player()
 	if k == null:
 		return WORLD.get_center()
@@ -136,6 +139,8 @@ func _process(delta: float) -> void:
 		if bg_rect:
 			var rel := (camera.position - WORLD.get_center()) / WORLD.size
 			bg_rect.position = Vector2(-110, -80) - rel * Vector2(160, 120)
+	if _cam_look_until > 0.0:
+		_cam_look_until -= delta
 	if invuln > 0.0:
 		invuln -= delta
 		_blink(delta)
@@ -699,9 +704,29 @@ func _paper_scene(idx: int) -> void:
 	cutscene = false
 	var gs = _gs()
 	if gs and gs.has_all_papers():
-		_hint("Semua pecahan terkumpul  ·  pergi ke portal di puncak", 5.0)
+		_show_portal()
 	elif gs:
 		_hint("Pecahan %d/4" % gs.papers.size(), 2.5)
+
+## Setelah pecahan ke-4: kamera menengok ke portal yang menyala lebih terang, lalu kembali.
+func _show_portal() -> void:
+	var k = _find_player()
+	if k:
+		k.set_movement_enabled(false)
+	_cam_look_until = 1.8
+	cam_zoom_target = 3.2
+	var am = get_node_or_null("/root/AudioManager")
+	if am:
+		am.play_sfx("rewind", 1.3, -6.0)
+	var t := create_tween().set_parallel(true)
+	t.tween_property(final_portal, "glow_boost", 1.3, 0.8)
+	t.tween_property(final_portal, "scale", Vector2(1.25, 1.25), 0.5).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.chain().tween_property(final_portal, "scale", Vector2(1.1, 1.1), 0.5)
+	_hint("Semua pecahan terkumpul  ·  pergi ke portal di puncak", 5.0)
+	await get_tree().create_timer(1.8).timeout
+	cam_zoom_target = CAM_ZOOM
+	if k and not cutscene and not finishing:
+		k.set_movement_enabled(true)
 
 # ---------------------------------------------------------------- portal terakhir: pecahan menyatu
 
@@ -881,7 +906,7 @@ func _autotest() -> void:
 			guard += 1
 		print("[AUTOTEST] block locked ", m.locked)
 		_end_merge()
-	k.global_position = L.FINALE_ZONE.get_center() + Vector2(-50, 30)
+	k.global_position = Vector2(L.FINALE_ZONE.get_center().x, L.FINAL_PORTAL.y)
 	await get_tree().create_timer(4.5).timeout
 	while dm.is_dialog_active():
 		dm.dialog_box._finish_typing()

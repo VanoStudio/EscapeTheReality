@@ -74,7 +74,9 @@ const LEVEL := [
 	["static", "L", 800, 400],
 	# puncak
 	["static", "S", 935, 360],
-	["static", "G", 860, 320],
+	["static", "M", 860, 322],
+	# puncak lebar, portal di ujung kiri: pemain menyeberangi puncak dulu sebelum finale
+	["static", "G", 700, 285],
 ]
 
 const PAPERS := [Vector2(85, 1012), Vector2(925, 822), Vector2(175, 632), Vector2(835, 372)]
@@ -103,8 +105,9 @@ const ASSISTS := [
 	[Vector2(790, 706), Vector2(345, 700)],
 	[Vector2(582, 452), Vector2(722, 432)],
 ]
-const FINAL_PORTAL := Vector2(915, 320)
-const FINALE_ZONE := Rect2(785, 250, 170, 72)
+const FINAL_PORTAL := Vector2(640, 285)
+# Pemicu finale hanya tepat di depan portal (bukan seluruh puncak).
+const FINALE_ZONE := Rect2(628, 235, 52, 50)
 
 static func tier_of(y: float) -> int:
 	if y > 960.0:

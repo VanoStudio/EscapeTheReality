@@ -14,6 +14,7 @@ func _ready() -> void:
 			if s == "opening": direct_scene = "res://scenes/opening.tscn"
 			elif s == "ending": direct_scene = "res://scenes/ending.tscn"
 			elif s == "menu": direct_scene = "res://scenes/ui/main_menu.tscn"
+			elif s == "credits": direct_scene = "res://scenes/credits.tscn"
 		elif arg.begins_with("--room="):
 			is_direct_room = true
 		elif arg.begins_with("--shot="):

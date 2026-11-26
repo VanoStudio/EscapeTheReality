@@ -195,12 +195,12 @@ func handle_f3_loop() -> void:
 		current_player.global_position.x = left_x
 
 ## Pindah ke scene non-ruangan (mis. ending comic): HUD disembunyikan, layar fade.
-func go_to_scene(scene_path: String) -> void:
+func go_to_scene(scene_path: String, fade_out: float = 0.4, fade_in: float = 0.4) -> void:
 	if is_transitioning:
 		return
 	is_transitioning = true
 	var tween = create_tween()
-	tween.tween_property(fade_overlay, "color:a", 1.0, 0.4)
+	tween.tween_property(fade_overlay, "color:a", 1.0, fade_out).set_trans(Tween.TRANS_SINE)
 	await tween.finished
 	if hud_instance:
 		hud_instance.visible = false
@@ -209,7 +209,8 @@ func go_to_scene(scene_path: String) -> void:
 	get_tree().change_scene_to_file(scene_path)
 	await get_tree().process_frame
 	await get_tree().process_frame
+	await get_tree().create_timer(0.15).timeout
 	var tween_in = create_tween()
-	tween_in.tween_property(fade_overlay, "color:a", 0.0, 0.4)
+	tween_in.tween_property(fade_overlay, "color:a", 0.0, fade_in).set_trans(Tween.TRANS_SINE)
 	await tween_in.finished
 	is_transitioning = false

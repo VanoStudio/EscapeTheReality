@@ -748,36 +748,7 @@
         "Hari pertama selesai. Masih ada dua hari lagi."
       ],
       "title": "Bersambung",
-      "credits": [
-        [
-          "Escape the Reality",
-          "Prototype Hari 1"
-        ],
-        [
-          "Konsep, cerita, desain karakter, potret dan panel webtoon, aset gambar",
-          "Erina Aprilia"
-        ],
-        [
-          "Programmer Godot, integrasi aset, build",
-          "Stevano Sunuprakoso Sosroraharjo"
-        ],
-        [
-          "Musik (CC0)",
-          "\"Emotional Piano\" oleh Centurion_of_war · \"Small Things\" oleh 3xBlast"
-        ],
-        [
-          "Ambience & efek suara (CC0)",
-          "Wolfgang_ · Tsorthan Grove · bart · Kenney (kenney.nl)"
-        ],
-        [
-          "Dibuat dengan",
-          "Godot Engine 4"
-        ],
-        [
-          "Tugas Akhir",
-          "November 2026"
-        ]
-      ]
+      "credits_scene": "res://scenes/credits.tscn"
     }
   }
 }

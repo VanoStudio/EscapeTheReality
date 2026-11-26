@@ -1257,19 +1257,13 @@ func _play_outro(outro: Dictionary, instant: bool = false) -> void:
 		await get_tree().create_timer(2.0).timeout
 		await create_tween().tween_property(box, "modulate:a", 0.0, 1.2).finished
 		box.queue_free()
+		var credits_scene := String(outro.get("credits_scene", ""))
+		var rm = get_node_or_null("/root/RoomManager")
+		if credits_scene != "" and ResourceLoader.exists(credits_scene) and rm and rm.has_method("go_to_scene"):
+			# Kredit punya adegan sendiri (data/credits.json) dengan jalan pulang ke menu.
+			rm.go_to_scene(credits_scene, 0.8, 0.8)
+			return
 		await _roll_credits(outro.get("credits", []))
-		var prompt := _make_label("Tekan Enter", 22, Color(0.9, 0.86, 0.78, 0.75))
-		prompt.modulate.a = 0.0
-		prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-		prompt.offset_top = -90
-		prompt.offset_left = -200
-		prompt.offset_right = 200
-		outro_root.add_child(prompt)
-		create_tween().tween_property(prompt, "modulate:a", 1.0, 0.8)
-		while true:
-			await get_tree().process_frame
-			if Input.is_action_just_pressed("interact") or Input.is_action_just_pressed("ui_accept"):
-				break
 		_go_next()
 
 func _roll_credits(credits: Array) -> void:

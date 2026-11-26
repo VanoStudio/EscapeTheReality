@@ -46,3 +46,8 @@ Kakak hanya bisa pulang jika berhenti memendam dan berani jujur mengakui perasaa
 - Aset: `tools/process_photo_and_sprite.py` (4 pecahan foto + sprite Kirana rumah dari zip), `tools/process_flow_assets.py` (latar, portal, pulau).
 - Debug CLI: `--room=<id>`, `--pos=x,y` dan `--shot_delay=<detik>` (dipakai bersama `--shot=`), `--autotest` (R2/F2/P1), `--autotest_collapse` (P1 -> F2), `--debug_papers=N` (P1).
 - R1, F3, F4, F5, K2, K3 tidak lagi di jalur utama (file disimpan).
+
+## Main menu & kredit
+- Main menu berlapis dari folder MAINMENU zip: `tools/process_menu_assets.py` -> `assets/processed/menu/`. Tombol gaya AAA: `scripts/ui/menu_button_fx.gd`.
+- Kredit: satu sumber `data/credits.json`, adegan `scenes/credits.tscn` (dari ending dan tombol KREDIT). Kembali ke menu lewat `RoomManager.go_to_scene` (fade keluar-masuk).
+- `--scene=credits` membuka kredit langsung.

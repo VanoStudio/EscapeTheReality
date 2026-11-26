@@ -1,0 +1,20 @@
+{
+  "_info": "Satu sumber kredit: dipakai roll setelah ending dan tombol KREDIT di main menu. Teks dari pemilik (27 Nov); ejaan nama pembuat aset disamakan dengan sumber CC0.",
+  "title": "CREDIT:",
+  "by": "By: ERINA APRILIA & STEVANO SUNUPRAKOSO SOSRORAHARJO",
+  "blocks": [
+    {
+      "role": "Musik (CC0)",
+      "who": "\"Emotional Piano\" oleh Centurion_of_war • \"Small Things\" oleh 3xBlast"
+    },
+    {
+      "role": "Ambience & efek suara (CC0)",
+      "who": "Wolfgang_ • Tsorthan Grove • bart • Kenney (kenney.nl)"
+    },
+    {
+      "role": "Dibuat dengan",
+      "who": "Godot Engine 4"
+    }
+  ],
+  "thanks": "THANK YOU PAK SEPTIAN & FRIENDS! :3"
+}
