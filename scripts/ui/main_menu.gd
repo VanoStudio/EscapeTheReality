@@ -195,7 +195,10 @@ func _build_buttons() -> void:
 	button_box.position = Vector2(96, 560)
 	button_box.add_theme_constant_override("separation", 6)
 	add_child(button_box)
-	var defs := [["Mulai", _on_start], ["Pengaturan", _on_settings], ["Kredit", _on_credits], ["Keluar", _on_quit]]
+	var defs := [["Mulai", _on_start], ["Pengaturan", _on_settings], ["Kredit", _on_credits]]
+	# Di browser (build web itch.io) tombol Keluar tidak berfungsi, jadi disembunyikan.
+	if not OS.has_feature("web"):
+		defs.append(["Keluar", _on_quit])
 	for d in defs:
 		var b: Button = ButtonFX.make(d[0], 40)
 		b.pressed.connect(d[1])

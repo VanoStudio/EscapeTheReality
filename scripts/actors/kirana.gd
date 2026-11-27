@@ -174,8 +174,19 @@ func set_movement_enabled(enabled: bool) -> void:
 func set_can_jump(allowed: bool) -> void:
 	can_jump = allowed
 
+const FRAMES_RUMAH := "res://assets/processed/characters/kirana_rumah/kirana_rumah_frames.tres"
+const FRAMES_FANTASI := "res://assets/processed/characters/kirana_fantasi/kirana_fantasy_frames.tres"
+
 func update_character_visual(is_fantasy: bool) -> void:
 	current_is_fantasy = is_fantasy
+	# Sprite dipilih di sini (bukan lewat override di R1/R2.tscn): override anak scene
+	# instance tidak terbawa ke build ekspor, sehingga web/exe memakai sprite lama.
+	if anim_sprite:
+		var want := FRAMES_FANTASI if is_fantasy else FRAMES_RUMAH
+		if anim_sprite.sprite_frames == null or anim_sprite.sprite_frames.resource_path != want:
+			var sf := load(want) as SpriteFrames
+			if sf:
+				anim_sprite.sprite_frames = sf
 	if jam_light:
 		jam_light.visible = is_fantasy
 	_play_anim("idle")

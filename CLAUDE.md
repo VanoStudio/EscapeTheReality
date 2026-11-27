@@ -64,3 +64,9 @@ Kakak hanya bisa pulang jika berhenti memendam dan berani jujur mengakui perasaa
 - F2: setelah Mbok, Bayangan berjalan menghampiri (`_shadow_come`), bicara, lalu kembali & membuka portal (`_shadow_return_and_open`).
 - Gerbang gema: tirai shader `shaders/echo_veil.gdshader`; sosok sesuai pembicara naskah (`suara_adik` tanpa sosok, `adik`, `adik_cermin`, `bayangan_adik`). Tanpa kartu "K1:"; diganti bisikan Bayangan `flow.json` `echo_bridge` (draft).
 - Finale K8: `FINALE_KIRANA_X`/`FINALE_SHADOW_X` di `p1_layout.gd`; yang bicara Bayangan Adik (sosok terpisah), bukan Bayangan Kirana.
+
+## Build itch.io
+- `python tools/build_itch.py` -> `build/itch/EscapeTheReality-windows.zip` (exe, pck tertanam) dan `EscapeTheReality-web.zip` (HTML5, single-threaded, tanpa SharedArrayBuffer).
+- Preset di `export_presets.cfg`; template ekspor ikut editor Steam (`editor_data/export_templates/4.7.2.stable`). `assets/raw`, `tests`, `tools`, `docs` tidak ikut diekspor.
+- Gambar lukisan besar (komik, potret, latar, menu) di-import lossy WebP 0.9 supaya web pck ~38 MB (itch: maks 200 MB per file). Sprite pixel tetap lossless.
+- Di web tombol Keluar (menu utama & pause) disembunyikan (`OS.has_feature("web")`).

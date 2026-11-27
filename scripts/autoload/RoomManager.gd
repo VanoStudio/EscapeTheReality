@@ -167,12 +167,14 @@ func _save_screenshot(shot_name: String) -> void:
 		await get_tree().create_timer(shot_delay).timeout
 	for i in range(5):
 		await get_tree().process_frame
-	var dir = DirAccess.open("res://")
-	if not dir.dir_exists("tests/screenshots"):
-		dir.make_dir_recursive("tests/screenshots")
 	var img = get_viewport().get_texture().get_image()
-	img.save_png("res://tests/screenshots/%s.png" % shot_name)
-	print("Screenshot captured: res://tests/screenshots/%s.png" % shot_name)
+	var path := "res://tests/screenshots/%s.png" % shot_name
+	DirAccess.make_dir_recursive_absolute("res://tests/screenshots")
+	if img.save_png(path) != OK:
+		# Build ekspor: res:// read-only, simpan di user://.
+		path = "user://%s.png" % shot_name
+		img.save_png(path)
+	print("Screenshot captured: %s (%s)" % [path, ProjectSettings.globalize_path(path)])
 	get_tree().quit(0)
 
 func respawn_player() -> void:

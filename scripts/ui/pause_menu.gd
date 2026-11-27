@@ -13,6 +13,8 @@ func _ready() -> void:
 		restart_button.pressed.connect(_on_restart_pressed)
 	if quit_button:
 		quit_button.pressed.connect(_on_quit_pressed)
+		# Build web: keluar dari game tidak bisa dilakukan dari dalam browser.
+		quit_button.visible = not OS.has_feature("web")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):
