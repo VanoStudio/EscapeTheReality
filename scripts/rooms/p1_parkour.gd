@@ -19,6 +19,7 @@ const LanternScript := preload("res://scripts/props/checkpoint_lantern.gd")
 const PortalScript := preload("res://scripts/props/portal_gate.gd")
 const FoodScript := preload("res://scripts/props/food_pickup.gd")
 const FollowerScript := preload("res://scripts/actors/bayangan_follower.gd")
+const GateScript := preload("res://scripts/props/echo_gate.gd")
 const L := preload("res://scripts/rooms/p1_layout.gd")
 
 const WORLD := Rect2(0, 140, 1000, 1010)
@@ -53,6 +54,12 @@ var _aura_t := 0.0
 var _blink_t := 0.0
 var _finale_warned := false
 var _cam_look_until := 0.0
+var checkpoint_idx := 0
+var _recall_hold := 0.0
+var gates: Array = []
+var echo_running := false
+var _shadow_hide_t := 0.0
+var _cam_focus := Vector2.INF
 
 func _ready() -> void:
 	super._ready()
@@ -70,6 +77,8 @@ func _ready() -> void:
 			gs.parkour_started = true
 			gs.set_energy(L.ENERGY_HEAVY if gs.has_heavy_legs() else L.ENERGY_ATE)
 		start_tier = clampi(gs.next_missing_paper(), 0, 3)
+		checkpoint_idx = maxi(gs.checkpoint_idx, _tier_start_checkpoint(start_tier))
+		gs.checkpoint_idx = checkpoint_idx
 	_build_level(start_tier)
 	var k = _find_player()
 	if k:
@@ -78,12 +87,14 @@ func _ready() -> void:
 		k.set_feel(L.COYOTE, L.JUMP_BUFFER, L.APEX_GRAVITY, L.MAX_FALL)
 		if gs and gs.has_heavy_legs():
 			k.set_heavy_legs(true)
-		k.global_position = L.TIER_STARTS[start_tier]
+		k.global_position = L.CHECKPOINTS[checkpoint_idx]
 		k.reset_air()
 		k.face_left(start_tier % 2 == 0)
 		k.landed.connect(_on_landed)
 		safe_pos = k.global_position
+		# Bayangan ikut dari jauh tapi tidak terlihat; muncul hanya saat ada perlu.
 		shadow = FollowerScript.new()
+		shadow.start_visible = false
 		add_child(shadow)
 		shadow.setup(k)
 	_snap_camera()
@@ -112,6 +123,8 @@ func _setup_camera() -> void:
 	camera.make_current()
 
 func _cam_target() -> Vector2:
+	if _cam_focus != Vector2.INF:
+		return _cam_focus
 	if _cam_look_until > 0.0:
 		return L.FINAL_PORTAL + Vector2(0, -40)
 	var k = _find_player()
@@ -144,7 +157,17 @@ func _process(delta: float) -> void:
 	if invuln > 0.0:
 		invuln -= delta
 		_blink(delta)
+	if _shadow_hide_t > 0.0:
+		_shadow_hide_t -= delta
+		if _shadow_hide_t <= 0.0 and not merging and shadow:
+			shadow.fade_to(0.0, 0.8)
 	_update_merge(delta)
+	_update_recall(delta)
+	var kk = _find_player()
+	if kk:
+		for g in gates:
+			if is_instance_valid(g) and not g.solved:
+				g.set_nearness(1.0 - clampf((kk.global_position.distance_to(g.global_position) - 30.0) / 120.0, 0.0, 1.0))
 
 func _blink(delta: float) -> void:
 	var k = _find_player()
@@ -156,14 +179,22 @@ func _blink(delta: float) -> void:
 func _physics_process(_delta: float) -> void:
 	# Catat pijakan aman terakhir (pulau diam, tidak di dekat zona trauma diam).
 	var k = _find_player()
-	if k == null or cutscene or not k.is_on_floor():
+	if k == null or cutscene or finishing:
+		return
+	var cp: Vector2 = L.CHECKPOINTS[checkpoint_idx]
+	# Jatuh jauh di bawah checkpoint (ke tingkat bawah): tarik kembali, jangan suruh memanjat ulang.
+	if k.global_position.y > cp.y + L.DEEP_FALL and k.global_position.y < kill_y:
+		on_player_fell(k)
+		return
+	if not k.is_on_floor():
 		return
 	for i in range(k.get_slide_collision_count()):
 		var col = k.get_slide_collision(i).get_collider()
 		if col is IslandScript and (col.kind == "static" or (col.kind == "movable" and col.locked)):
 			var half: float = col.width * 0.48 - 8.0
 			var p := Vector2(clampf(k.global_position.x, col.global_position.x - half, col.global_position.x + half), col.global_position.y)
-			if not _near_static_trauma(p):
+			# Pijakan aman hanya di tingkat checkpoint atau lebih tinggi (bukan setelah jatuh ke bawah).
+			if not _near_static_trauma(p) and p.y <= cp.y + 40.0:
 				safe_pos = p
 			break
 
@@ -172,6 +203,71 @@ func _near_static_trauma(p: Vector2) -> bool:
 		if z.patrol == Vector2.ZERO and absf(z.position.x - p.x) < 30.0 and absf(z.position.y - p.y) < 30.0:
 			return true
 	return false
+
+## Pembicara gerbang diambil dari naskah (flow.json), supaya sosok di kabut selalu cocok:
+## suara_adik = hanya suara, adik = siluet Adik, adik_cermin = pantulan, bayangan_adik = bayangan hitam.
+func _echo_speaker(id: String) -> String:
+	var dm = _dm()
+	if dm:
+		var r = dm.flow("echo/%s/rounds" % id)
+		if r is Array and not r.is_empty():
+			return String(r[0].get("speaker", "adik"))
+	return "adik"
+
+func _tier_start_checkpoint(tier: int) -> int:
+	return [0, 3, 6, 9][clampi(tier, 0, 3)]
+
+func _reach_checkpoint(idx: int) -> void:
+	# Checkpoint tidak boleh melewati pecahan yang belum diambil (kalau pemain melewatkan pecahan
+	# lalu turun lagi untuk mengambilnya, ia tidak boleh ditarik kembali ke atas).
+	var gs0 = _gs()
+	if gs0:
+		var miss: int = gs0.next_missing_paper()
+		if miss < L.PAPER_CHECKPOINT.size():
+			idx = mini(idx, L.PAPER_CHECKPOINT[miss])
+	if idx <= checkpoint_idx:
+		return
+	checkpoint_idx = idx
+	var gs = _gs()
+	if gs:
+		gs.checkpoint_idx = idx
+
+## Tahan R: kembali ke checkpoint (kalau tersangkut).
+func _update_recall(delta: float) -> void:
+	var k = _find_player()
+	if k == null or cutscene or finishing or merging or echo_running or _dialog_busy():
+		_recall_hold = 0.0
+		return
+	if Input.is_key_pressed(KEY_R):
+		_recall_hold += delta
+		if _recall_hold >= L.RECALL_HOLD:
+			_recall_hold = 0.0
+			if not _damage(L.DMG_RECALL):
+				_warp(k, L.CHECKPOINTS[checkpoint_idx])
+	else:
+		_recall_hold = 0.0
+
+func _warp(k: Node2D, pos: Vector2) -> void:
+	k.set_movement_enabled(false)
+	k.velocity = Vector2.ZERO
+	k.global_position = pos
+	k.reset_air()
+	safe_pos = pos
+	_snap_camera()
+	invuln = 0.8
+	k.modulate.a = 0.0
+	var t := create_tween()
+	t.tween_property(k, "modulate:a", 1.0, 0.35)
+	await t.finished
+	if not cutscene and not finishing and not echo_running:
+		k.set_movement_enabled(true)
+
+## Bayangan muncul sebentar (bicara/bantu), lalu memudar lagi.
+func _shadow_show(hold: float = 3.0) -> void:
+	if shadow == null:
+		return
+	shadow.fade_to(0.85, 0.4)
+	_shadow_hide_t = hold
 
 # ---------------------------------------------------------------- bangun level
 
@@ -275,9 +371,24 @@ func _build_level(start_tier: int) -> void:
 		var l = LanternScript.new()
 		l.position = L.LANTERNS[i]
 		add_child(l)
-		if i <= start_tier:
+		var cp_idx: int = L.CHECKPOINTS.find(L.LANTERNS[i])
+		l.set_meta("cp", cp_idx)
+		if cp_idx <= checkpoint_idx:
 			l.light_up(true)
 		l.reached.connect(_on_lantern)
+	for gdef in L.ECHO_GATES:
+		if gs and gs.echo_done.has(gdef["id"]):
+			continue
+		var g = GateScript.new()
+		g.gate_id = gdef["id"]
+		g.speaker = _echo_speaker(gdef["id"])
+		g.figure_scale = 0.35 * BODY_SCALE
+		g.wall_height = gdef["h"]
+		g.trigger_rect = gdef["trigger"]
+		g.position = gdef["wall"]
+		add_child(g)
+		g.triggered.connect(_on_gate)
+		gates.append(g)
 	for tz in L.TRAUMAS:
 		var z = TraumaScript.new()
 		z.position = tz[0]
@@ -344,6 +455,8 @@ func _bubble(who: Node2D, path: String, style: String = "speech", hold: float = 
 	if dm == null or who == null:
 		return null
 	var off := BUBBLE_OFFSET if who == _find_player() else Vector2(0, -50)
+	if who == shadow:
+		_shadow_show(4.0)
 	return dm.bubble(who, dm.flow(path), style, hold, off)
 
 func _intro(start_tier: int) -> void:
@@ -358,6 +471,8 @@ func _intro(start_tier: int) -> void:
 		_hint("Semua pecahan terkumpul  ·  pergi ke portal di puncak", 5.0)
 	elif start_tier == 0:
 		_hint("Kumpulkan 4 pecahan foto  ·  Spasi / W  lompat (tahan = lebih tinggi)", 6.0)
+		await get_tree().create_timer(6.5).timeout
+		_hint("Tersangkut?  Tahan R  kembali ke checkpoint", 4.5)
 	else:
 		_hint("Lanjut cari pecahan ke-%d" % (start_tier + 1), 4.0)
 
@@ -436,7 +551,8 @@ func _assist(tier: int) -> void:
 	if shadow:
 		_bubble(shadow, "parkour/assist", "speech")
 
-func _on_lantern(_lan: Node) -> void:
+func _on_lantern(lan: Node) -> void:
+	_reach_checkpoint(int(lan.get_meta("cp", 0)))
 	_heal(L.HEAL_LANTERN)
 
 # ---------------------------------------------------------------- trauma & jatuh
@@ -492,20 +608,12 @@ func _on_landed(drop: float) -> void:
 func on_player_fell(player: Node2D) -> void:
 	if finishing:
 		return
+	if invuln > 0.5:
+		return
 	_fail()
 	if _damage(L.DMG_VOID):
 		return
-	player.set_movement_enabled(false)
-	player.velocity = Vector2.ZERO
-	player.global_position = safe_pos
-	player.reset_air()
-	_snap_camera()
-	invuln = 0.8
-	player.modulate.a = 0.0
-	var t := create_tween()
-	t.tween_property(player, "modulate:a", 1.0, 0.35)
-	await t.finished
-	player.set_movement_enabled(true)
+	_warp(player, safe_pos)
 
 func _collapse() -> void:
 	# Energi habis: pingsan, bangun di pasar Mbok Luna.
@@ -586,10 +694,12 @@ func _start_merge(m: Node) -> void:
 	if am:
 		am.play_sfx("rewind", 1.5, -10.0)
 	if shadow:
+		# Bayangan muncul sekejap lalu masuk ke tubuh Kirana.
 		shadow.active = false
+		shadow.modulate.a = 0.85
 		var t := create_tween().set_parallel(true)
-		t.tween_property(shadow, "global_position", k.global_position, 0.25).set_trans(Tween.TRANS_SINE)
-		t.tween_property(shadow, "modulate:a", 0.0, 0.25)
+		t.tween_property(shadow, "global_position", k.global_position, 0.3).set_trans(Tween.TRANS_SINE)
+		t.tween_property(shadow, "modulate:a", 0.0, 0.35)
 
 func _end_merge() -> void:
 	if not merging:
@@ -604,7 +714,7 @@ func _end_merge() -> void:
 		k.set_movement_enabled(true)
 	if shadow:
 		shadow.active = true
-		create_tween().tween_property(shadow, "modulate:a", 0.82, 0.3)
+		shadow.fade_to(0.0, 0.3)
 
 func _on_block_placed(_block: Node) -> void:
 	_end_merge()
@@ -615,6 +725,146 @@ func _on_block_placed(_block: Node) -> void:
 			left += 1
 	if left == 1:
 		_hint("Satu batu lagi", 2.5)
+
+# ---------------------------------------------------------------- gerbang gema (K1-K8)
+
+func _on_gate(g: Node) -> void:
+	if echo_running or cutscene or finishing:
+		return
+	var ok: bool = await _run_echo(g.gate_id)
+	if ok and is_instance_valid(g):
+		g.dissolve()
+		shake = 0.3
+		var am = get_node_or_null("/root/AudioManager")
+		if am:
+			am.play_sfx("tick", 1.2, 2.0)
+
+## Kartu adegan + 2 ronde. Hanya Jujur yang maju; selain itu ronde diulang (pilihan diacak lagi)
+## dan energi berkurang. Hasil false kalau energi habis di tengah percakapan.
+func _run_echo(id: String) -> bool:
+	var dm = _dm()
+	var gs = _gs()
+	if dm == null:
+		return true
+	var data = dm.flow("echo/" + id)
+	if not (data is Dictionary):
+		return true
+	echo_running = true
+	_end_merge()
+	var k = _find_player()
+	if k:
+		k.set_movement_enabled(false)
+	var old_inv := invuln
+	invuln = 999.0
+	# Tanpa kartu "K1: ..." (ruangan di naskah tidak ada di dunia pulau melayang):
+	# Bayangan berbisik satu kalimat penghubung, lalu suara Adik langsung terdengar.
+	var hush := _make_overlay()
+	create_tween().tween_property(hush["dim"], "color:a", 0.32, 0.6)
+	var am0 = get_node_or_null("/root/AudioManager")
+	if am0:
+		am0.play_sfx("heartbeat", 0.9, -8.0)
+	var bridge = dm.flow("echo_bridge/" + id)
+	if bridge is Dictionary and shadow:
+		shadow.active = false
+		var kp: Vector2 = k.global_position if k else Vector2.ZERO
+		shadow.global_position = kp + Vector2(22.0 if k and not k.get_node("AnimatedSprite2D").flip_h else -22.0, 0)
+		var b = _bubble(shadow, "echo_bridge/" + id, "speech", 1.6)
+		if b:
+			await b.finished
+		shadow.fade_to(0.0, 0.5)
+		shadow.active = true
+	var rounds: Array = data.get("rounds", [])
+	var r := 0
+	var am = get_node_or_null("/root/AudioManager")
+	while r < rounds.size():
+		var picked: Dictionary = await dm.play_echo_round(rounds[r])
+		var kind := String(picked.get("type", ""))
+		var delta := int(L.ECHO_ENERGY.get(kind, 0))
+		if kind == "jujur":
+			r += 1
+			if am:
+				am.play_sfx("tick", 1.4)
+			if delta > 0:
+				_heal(delta)
+		else:
+			shake = 0.5
+			flash_rect.color.a = 0.3
+			create_tween().tween_property(flash_rect, "color:a", 0.0, 0.6)
+			if am:
+				am.play_sfx("rewind", 0.8, -6.0)
+			if delta < 0 and _damage(-delta):
+				dm.close_echo()
+				if is_instance_valid(hush["layer"]):
+					hush["layer"].queue_free()
+				echo_running = false
+				return false
+	dm.close_echo()
+	if is_instance_valid(hush["layer"]):
+		var hout := create_tween()
+		hout.tween_property(hush["dim"], "color:a", 0.0, 0.5)
+		hout.tween_callback(hush["layer"].queue_free)
+	if gs and not gs.echo_done.has(id):
+		gs.echo_done.append(id)
+	echo_running = false
+	invuln = maxf(old_inv, 0.6) if old_inv < 900.0 else 0.6
+	if k and not finishing and not cutscene:
+		k.set_movement_enabled(true)
+	return true
+
+## Kartu adegan (judul + deskripsi dari naskah), lanjut dengan Enter / klik.
+func _scene_card(title: String, scene: String) -> void:
+	var ov := _make_overlay()
+	var layer: CanvasLayer = ov["layer"]
+	var dim: ColorRect = ov["dim"]
+	var box := VBoxContainer.new()
+	box.position = Vector2(260, 300)
+	box.size = Vector2(1400, 400)
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 26)
+	box.modulate.a = 0.0
+	layer.add_child(box)
+	var t := Label.new()
+	t.text = title
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	t.add_theme_font_size_override("font_size", 56)
+	t.add_theme_color_override("font_color", Color(1.0, 0.84, 0.55))
+	_apply_bold(t)
+	box.add_child(t)
+	var d := Label.new()
+	d.text = scene
+	d.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	d.custom_minimum_size = Vector2(1400, 0)
+	d.add_theme_font_size_override("font_size", 34)
+	d.add_theme_color_override("font_color", Color(0.95, 0.92, 0.88))
+	_apply_bold(d)
+	box.add_child(d)
+	var h := Label.new()
+	h.text = "Enter / klik  lanjut"
+	h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	h.add_theme_font_size_override("font_size", 24)
+	h.add_theme_color_override("font_color", Color(0.9, 0.85, 0.8, 0.6))
+	box.add_child(h)
+	var am = get_node_or_null("/root/AudioManager")
+	if am:
+		am.play_sfx("heartbeat", 0.9, -6.0)
+	var tin := create_tween().set_parallel(true)
+	tin.tween_property(dim, "color:a", 0.75, 0.5)
+	tin.tween_property(box, "modulate:a", 1.0, 0.6)
+	await tin.finished
+	var dm = _dm()
+	var waited := 0.0
+	var limit := 0.3 if (dm and dm.is_bot()) or autotest else 12.0
+	while waited < limit:
+		await get_tree().process_frame
+		waited += get_process_delta_time()
+		if waited > 0.4 and (Input.is_action_just_pressed("ui_accept") or Input.is_action_just_pressed("interact") or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)):
+			break
+	var tout := create_tween().set_parallel(true)
+	tout.tween_property(dim, "color:a", 0.0, 0.4)
+	tout.tween_property(box, "modulate:a", 0.0, 0.4)
+	await tout.finished
+	layer.queue_free()
 
 # ---------------------------------------------------------------- kertas: zoom + tunjukkan pecahan
 
@@ -650,6 +900,7 @@ func _on_paper(idx: int) -> void:
 	var gs = _gs()
 	if gs:
 		gs.collect_paper(idx)
+	_reach_checkpoint(L.PAPER_CHECKPOINT[idx])
 	_refresh_hud()
 	_paper_scene(idx)
 
@@ -750,13 +1001,44 @@ func _finale() -> void:
 	_end_merge()
 	var k = _find_player()
 	k.set_movement_enabled(false)
-	k.face_left(false)
+	k.face_left(L.FINAL_PORTAL.x < k.global_position.x)
 	k.modulate = Color.WHITE
 	invuln = 999.0
 	var hud = RoomManager.hud_instance
 	if hud and hud.has_method("hide_hint"):
 		hud.hide_hint()
-	cam_zoom_target = 4.8
+	cam_zoom_target = 4.3
+	# Kirana berhenti dengan jarak lega dari portal.
+	await _walk_kirana_to(L.FINALE_KIRANA_X)
+	k.face_left(true)
+	# Bayangan milik Kirana tidak ikut; yang datang adalah bayangan ADIK (K8).
+	if shadow:
+		shadow.fade_to(0.0, 0.3)
+	var adik_shadow := _make_adik_shadow(Vector2(L.FINALE_SHADOW_X, L.FINAL_PORTAL.y))
+	_cam_focus = Vector2((L.FINAL_PORTAL.x + L.FINALE_KIRANA_X) * 0.5, L.FINAL_PORTAL.y + 18.0)
+	await get_tree().create_timer(1.0).timeout
+	var gs8 = _gs()
+	if gs8 == null or not gs8.echo_done.has("K8"):
+		var ok: bool = await _run_echo("K8")
+		if not ok:
+			return
+	var dm8 = _dm()
+	if dm8:
+		var closing = dm8.flow("echo/K8/closing")
+		if closing is Dictionary:
+			await dm8.play_lines([closing])
+	k.set_movement_enabled(false)
+	invuln = 999.0
+	var am8 = get_node_or_null("/root/AudioManager")
+	if am8:
+		am8.play_sfx("tick", 1.0, 2.0)
+	# Bayangan Adik tersenyum lalu larut menjadi cahaya.
+	var st8 := create_tween().set_parallel(true)
+	st8.tween_property(adik_shadow, "modulate", Color(1.6, 1.5, 1.2, 0.0), 1.4)
+	st8.tween_property(adik_shadow, "scale", adik_shadow.scale * Vector2(0.5, 1.4), 1.4)
+	await st8.finished
+	adik_shadow.queue_free()
+	_cam_focus = Vector2.INF
 	var ov := _make_overlay()
 	var layer: CanvasLayer = ov["layer"]
 	var dim: ColorRect = ov["dim"]
@@ -831,6 +1113,7 @@ func _finale() -> void:
 
 	# Kirana berjalan masuk portal.
 	cam_zoom_target = 4.2
+	k.face_left(L.FINAL_PORTAL.x < k.global_position.x)
 	k._play_anim("walk")
 	var dist: float = absf(L.FINAL_PORTAL.x - k.global_position.x)
 	var walk := create_tween()
@@ -851,6 +1134,44 @@ func _finale() -> void:
 	w.tween_property(white, "color:a", 1.0, 1.4).set_trans(Tween.TRANS_SINE)
 	await w.finished
 	RoomManager.go_to_scene("res://scenes/ending.tscn")
+
+func _walk_kirana_to(x: float) -> void:
+	var k = _find_player()
+	if k == null or absf(k.global_position.x - x) < 2.0:
+		return
+	k.face_left(x < k.global_position.x)
+	k._play_anim("walk")
+	var t := create_tween()
+	t.tween_property(k, "global_position:x", x, absf(x - k.global_position.x) / 70.0)
+	await t.finished
+	k._play_anim("idle")
+
+## Sosok bayangan Adik (hitam pekat, lebih kecil dari Kirana) untuk pertemuan terakhir.
+func _make_adik_shadow(pos: Vector2) -> AnimatedSprite2D:
+	var a := AnimatedSprite2D.new()
+	a.sprite_frames = load("res://assets/processed/characters/kirana_fantasi/kirana_fantasy_frames.tres") as SpriteFrames
+	a.play("idle")
+	a.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	var sc := 0.35 * BODY_SCALE * 0.9
+	a.scale = Vector2(sc, sc)
+	a.global_position = pos + Vector2(0, -(240.0 - 128.0) * sc)
+	a.flip_h = false
+	a.modulate = Color(0.04, 0.02, 0.06, 0.0)
+	a.z_index = 1
+	add_child(a)
+	var mist := CPUParticles2D.new()
+	mist.texture = RoomFX.dot_texture()
+	mist.amount = 24
+	mist.lifetime = 1.8
+	mist.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	mist.emission_rect_extents = Vector2(10, 22)
+	mist.gravity = Vector2(0, -10)
+	mist.scale_amount_min = 0.08
+	mist.scale_amount_max = 0.2
+	mist.color = Color(0.25, 0.1, 0.35, 0.7)
+	a.add_child(mist)
+	create_tween().tween_property(a, "modulate:a", 0.95, 1.0)
+	return a
 
 func _photo_meta() -> Dictionary:
 	var path := PIECE_DIR + "photo_pieces.json"
@@ -875,6 +1196,19 @@ func _autotest() -> void:
 	var dm = _dm()
 	var before: int = gs.stability
 	var pos_before: Vector2 = k.global_position
+	# Gerbang gema K1 (jalankan dengan --bot=jujur supaya pilihan otomatis).
+	var g1: Node = gates[0] if not gates.is_empty() else null
+	if g1:
+		k.global_position = Vector2(g1.trigger_rect.get_center().x, g1.position.y)
+		await get_tree().create_timer(0.5).timeout
+		while echo_running:
+			await get_tree().process_frame
+		await get_tree().create_timer(0.3).timeout
+		print("[AUTOTEST] gate K1 solved ", g1.solved, " energy ", gs.stability, " done ", gs.echo_done)
+	k.global_position = L.CHECKPOINTS[0]
+	await get_tree().create_timer(0.3).timeout
+	before = gs.stability
+	pos_before = k.global_position
 	_on_trauma(traumas[0])
 	await get_tree().create_timer(0.6).timeout
 	print("[AUTOTEST] trauma energy ", before, " -> ", gs.stability, " stayed near ", k.global_position.distance_to(pos_before) < 120.0)
@@ -895,7 +1229,15 @@ func _autotest() -> void:
 			await get_tree().create_timer(0.1).timeout
 		while cutscene:
 			await get_tree().process_frame
-	print("[AUTOTEST] papers ", gs.papers, " all ", gs.has_all_papers(), " energy ", gs.stability)
+	print("[AUTOTEST] papers ", gs.papers, " all ", gs.has_all_papers(), " energy ", gs.stability, " cp ", checkpoint_idx)
+	# Jatuh ke tingkat bawah setelah checkpoint tingkat 3: harus ditarik ke checkpoint, bukan ke bawah.
+	safe_pos = L.CHECKPOINTS[checkpoint_idx]
+	invuln = 0.0
+	k.global_position = Vector2(300, 1030)
+	await get_tree().create_timer(0.9).timeout
+	print("[AUTOTEST] deep fall back near checkpoint ", k.global_position.distance_to(L.CHECKPOINTS[checkpoint_idx]) < 60.0, " pos ", k.global_position)
+	invuln = 0.0
+
 	for m in movables:
 		k.global_position = m.target + Vector2(-60, -2)
 		_start_merge(m)

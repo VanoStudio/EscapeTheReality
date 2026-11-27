@@ -51,3 +51,16 @@ Kakak hanya bisa pulang jika berhenti memendam dan berani jujur mengakui perasaa
 - Main menu berlapis dari folder MAINMENU zip: `tools/process_menu_assets.py` -> `assets/processed/menu/`. Tombol gaya AAA: `scripts/ui/menu_button_fx.gd`.
 - Kredit: satu sumber `data/credits.json`, adegan `scenes/credits.tscn` (dari ending dan tombol KREDIT). Kembali ke menu lewat `RoomManager.go_to_scene` (fade keluar-masuk).
 - `--scene=credits` membuka kredit langsung.
+
+## Rombak #4 (Percakapan_Dunia_Lain_Kirana_Adik.pdf)
+- K1-K7 = gerbang gema di P1 (`ECHO_GATES` di `p1_layout.gd`, prop `scripts/props/echo_gate.gd`); K8 di depan portal terakhir. Teks persis di `flow.json` bagian `echo`. Hanya Jujur yang membuka; pilihan diacak, energi `ECHO_ENERGY`.
+- Checkpoint P1 = `CHECKPOINTS` (hanya maju, dibatasi pecahan yang belum diambil). Jatuh > `DEEP_FALL` di bawah checkpoint = ditarik kembali. Tahan R = kembali ke checkpoint.
+- Opening: Enter/klik memunculkan panel "E TO SKIP"; tahan E = langsung ke gameplay.
+- F2: Kirana muncul dari kanan, jalur di depan warung (`LANE_Y`), kamera ikut (`owns_camera` membuat RoomFX tidak menggeser kamera). Bayangan hanya muncul saat ada perlu.
+
+## Rombak #5
+- Kotak pilihan: `scripts/ui/choice_card.gd` (gambar prosedural) + gaya di `data/choice_style.tres` (`ChoiceStyle`, ubah ukuran/warna/font/animasi lewat Inspector).
+- Portal: `face_left` di `portal_gate.gd` (F1 & portal datang F2 = true, Kirana keluar ke kiri).
+- F2: setelah Mbok, Bayangan berjalan menghampiri (`_shadow_come`), bicara, lalu kembali & membuka portal (`_shadow_return_and_open`).
+- Gerbang gema: tirai shader `shaders/echo_veil.gdshader`; sosok sesuai pembicara naskah (`suara_adik` tanpa sosok, `adik`, `adik_cermin`, `bayangan_adik`). Tanpa kartu "K1:"; diganti bisikan Bayangan `flow.json` `echo_bridge` (draft).
+- Finale K8: `FINALE_KIRANA_X`/`FINALE_SHADOW_X` di `p1_layout.gd`; yang bicara Bayangan Adik (sosok terpisah), bukan Bayangan Kirana.

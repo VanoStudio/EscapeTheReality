@@ -1,27 +1,36 @@
 class_name F2KitchenMarket
 extends BaseRoom
 
-# Pasar terapung Mbok Luna (FLOW KIRANA hal. 3-6).
-# Kirana keluar dari portal kiri -> bicara dengan Mbok Luna (pilihan makan / tidak)
-# -> Bayangan muncul lagi, memberi misi 4 kertas, lalu membuka portal di kanan -> P1 (parkour).
+# Pasar terapung Mbok Luna (FLOW KIRANA hal. 3-6), rombak #3.
+# Kirana muncul dari portal KANAN -> berjalan ke kiri, lewat di DEPAN warung -> bicara dengan Mbok Luna
+# (pilihan makan / tidak) -> Bayangan muncul di pulau kiri, memberi misi, membuka portal di sana -> P1.
+# Bayangan tidak mengikuti terus: hanya muncul saat ada perlu, lalu memudar.
 
 const PortalScript := preload("res://scripts/props/portal_gate.gd")
 const FollowerScript := preload("res://scripts/actors/bayangan_follower.gd")
 
-const FLOOR_Y := 113.0
+const LANE_Y := 135.0               # jalur jalan di rumput depan warung (warung ada di belakang)
 const LEFT_ISLAND_END := 106.0
 const RIGHT_ISLAND_START := 113.0
-const MBOK_POS := Vector2(198, 113)
-const ARRIVE_PORTAL := Vector2(18, 113)
-const EXIT_PORTAL := Vector2(448, 113)
-const BODY_SCALE := 0.88
+const MBOK_POS := Vector2(196, 124)
+const ARRIVE_PORTAL := Vector2(458, LANE_Y)
+const SHADOW_POS := Vector2(55, LANE_Y)
+const EXIT_PORTAL := Vector2(24, LANE_Y)
+const TALK_X := MBOK_POS.x + 42.0
+const MEET_KIRANA_X := 266.0        # Kirana melangkah ke sini supaya Bayangan punya ruang
+const MEET_SHADOW_X := 228.0        # Bayangan berhenti di sini (antara Mbok dan Kirana)
+const BODY_SCALE := 0.8
 const BUBBLE_OFFSET := Vector2(0, -70)
+const CAM_ZOOM := 4.6
+const BG_RECT := Rect2(-11.5, -2.7, 503.0, 275.4)
 
+var owns_camera := true
 var arrive_portal: PortalScript
 var exit_portal: PortalScript
 var shadow: FollowerScript
 var mbok: Node2D
 var talked := false
+var _view_half := Vector2.ZERO
 
 func _ready() -> void:
 	super._ready()
@@ -29,6 +38,7 @@ func _ready() -> void:
 	_build_mbok()
 	arrive_portal = PortalScript.new()
 	arrive_portal.height = 70.0
+	arrive_portal.face_left = true
 	arrive_portal.position = ARRIVE_PORTAL
 	add_child(arrive_portal)
 	exit_portal = PortalScript.new()
@@ -38,24 +48,55 @@ func _ready() -> void:
 	add_child(exit_portal)
 	exit_portal.entered.connect(_on_exit_portal)
 	var k = _find_player()
-	if k and k.has_method("set_body_scale"):
+	if k:
 		k.set_body_scale(BODY_SCALE)
+		k.z_index = 2
 	var gs = get_node_or_null("/root/GameState")
 	if gs and gs.has_heavy_legs() and k:
 		k.set_heavy_legs(true)
+	_snap_camera()
 	if gs and gs.wake_pending:
 		# Energi habis di parkour: bangun di depan warung Mbok Luna.
 		gs.wake_pending = false
 		talked = true
 		_wake.call_deferred()
 		return
-	_add_trigger(Vector2(MBOK_POS.x - 40, FLOOR_Y - 30), Vector2(24, 60), _talk)
 	if "--autotest" in OS.get_cmdline_user_args() or "--autotest" in OS.get_cmdline_args():
 		_autotest_choice.call_deferred()
 		return
 	_arrive()
 
-# Jarak antar pulau 7 px: cukup diloncati, jatuh = kembali ke titik muncul.
+# ---------------------------------------------------------------- kamera mengikuti
+
+func _setup_camera() -> void:
+	super._setup_camera()
+	camera.zoom = Vector2(CAM_ZOOM, CAM_ZOOM)
+	_view_half = Vector2(1920.0, 1080.0) / CAM_ZOOM * 0.5
+
+func _cam_target() -> Vector2:
+	var k = _find_player()
+	var x: float = k.global_position.x if k else 240.0
+	# Pulau di sepertiga bawah: pusat kamera sedikit di atas jalur.
+	var y := LANE_Y - 22.0
+	return Vector2(
+		clampf(x, BG_RECT.position.x + _view_half.x, BG_RECT.end.x - _view_half.x),
+		clampf(y, BG_RECT.position.y + _view_half.y, BG_RECT.end.y - _view_half.y))
+
+func _snap_camera() -> void:
+	if camera:
+		camera.position = _cam_target()
+
+func _process(delta: float) -> void:
+	if camera:
+		camera.position = camera.position.lerp(_cam_target(), 1.0 - exp(-4.0 * delta))
+	var k = _find_player()
+	if k and not talked and k.global_position.x <= TALK_X:
+		talked = true
+		_talk()
+
+# ---------------------------------------------------------------- dunia
+
+# Celah antar pulau 7 px (cukup dilewati); jatuh = kembali ke depan warung.
 func _build_islands() -> void:
 	var body := StaticBody2D.new()
 	add_child(body)
@@ -64,20 +105,21 @@ func _build_islands() -> void:
 		var r := RectangleShape2D.new()
 		r.size = Vector2(seg[1] - seg[0], 20)
 		cs.shape = r
-		cs.position = Vector2((seg[0] + seg[1]) * 0.5, FLOOR_Y + 10)
+		cs.position = Vector2((seg[0] + seg[1]) * 0.5, LANE_Y + 10)
 		body.add_child(cs)
-	for x in [4.0, 474.0]:
+	for x in [4.0, 476.0]:
 		var wall := CollisionShape2D.new()
 		var wr := RectangleShape2D.new()
 		wr.size = Vector2(10, 200)
 		wall.shape = wr
-		wall.position = Vector2(x, 20)
+		wall.position = Vector2(x, 40)
 		body.add_child(wall)
 
 func _build_mbok() -> void:
 	mbok = Node2D.new()
 	mbok.name = "MbokLuna"
 	mbok.position = MBOK_POS
+	mbok.z_index = 1
 	add_child(mbok)
 	var spr := Sprite2D.new()
 	spr.texture = load("res://assets/processed/characters/penjual_clean.png") as Texture2D
@@ -87,26 +129,9 @@ func _build_mbok() -> void:
 		var k := 58.0 / 210.0
 		spr.scale = Vector2(k, k)
 		spr.position = Vector2(0, -(240.0 - 128.0) * k)
-	spr.flip_h = true
+	spr.flip_h = true   # menghadap kanan, ke arah Kirana datang
 	spr.light_mask = 1 | 2
 	mbok.add_child(spr)
-
-func _add_trigger(pos: Vector2, size: Vector2, cb: Callable) -> Area2D:
-	var a := Area2D.new()
-	a.collision_layer = 0
-	a.collision_mask = 2
-	a.position = pos
-	var cs := CollisionShape2D.new()
-	var r := RectangleShape2D.new()
-	r.size = size
-	cs.shape = r
-	a.add_child(cs)
-	add_child(a)
-	a.body_entered.connect(func(b: Node2D) -> void:
-		if b.is_in_group("player") and a.monitoring:
-			a.set_deferred("monitoring", false)
-			cb.call())
-	return a
 
 func _dm() -> Node:
 	return get_node_or_null("/root/DialogManager")
@@ -118,33 +143,114 @@ func _hint(text: String, dur: float = 4.0) -> void:
 
 func on_player_fell(player: Node2D) -> void:
 	player.velocity = Vector2.ZERO
-	player.global_position = Vector2(40, FLOOR_Y)
+	player.global_position = Vector2(MBOK_POS.x + 60, LANE_Y)
+	player.reset_air()
+
+# ---------------------------------------------------------------- Bayangan: muncul saat perlu saja
+
+func _shadow_appear(pos: Vector2) -> void:
+	var k = _find_player()
+	if shadow == null:
+		shadow = FollowerScript.new()
+		add_child(shadow)
+		shadow.setup(k)
+	shadow.active = false
+	shadow.global_position = pos
+	shadow.modulate.a = 0.0
+	var spr: AnimatedSprite2D = shadow.sprite
+	if spr and k:
+		spr.flip_h = k.global_position.x < pos.x
+	var am = get_node_or_null("/root/AudioManager")
+	if am:
+		am.play_sfx("rewind", 0.7, -8.0)
+	shadow.scale = Vector2(0.6, 1.3)
+	var t := create_tween().set_parallel(true)
+	t.tween_property(shadow, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	t.tween_property(shadow, "modulate:a", 0.85, 0.5)
+	await t.finished
+
+## Bayangan berjalan (animasi jalan) ke x tertentu di jalur.
+func _shadow_walk_to(x: float, speed: float = 62.0) -> void:
+	if shadow == null:
+		return
+	var spr: AnimatedSprite2D = shadow.sprite
+	var dir := signf(x - shadow.global_position.x)
+	if spr:
+		spr.flip_h = dir < 0.0
+		if spr.sprite_frames and spr.sprite_frames.has_animation("walk"):
+			spr.play("walk")
+	var dist := absf(x - shadow.global_position.x)
+	var t := create_tween()
+	t.tween_property(shadow, "global_position:x", x, maxf(dist / speed, 0.2))
+	await t.finished
+	if spr and spr.sprite_frames and spr.sprite_frames.has_animation("idle"):
+		spr.play("idle")
+
+## Kirana melangkah sendiri sedikit (mis. memberi ruang untuk Bayangan).
+func _kirana_step_to(x: float) -> void:
+	var k = _find_player()
+	if k == null:
+		return
+	k.face_left(x < k.global_position.x)
+	k._play_anim("walk")
+	var t := create_tween()
+	t.tween_property(k, "global_position:x", x, maxf(absf(x - k.global_position.x) / 70.0, 0.2))
+	await t.finished
+	k._play_anim("idle")
+
+## Bayangan muncul di pulau kiri, berjalan menghampiri Kirana, (pemanggil menjalankan dialog),
+## lalu kembali ke pulau kiri dan membuka portal di sana.
+func _shadow_come() -> void:
+	var k = _find_player()
+	await _kirana_step_to(MEET_KIRANA_X)
+	if k:
+		k.face_left(true)
+	await _shadow_appear(SHADOW_POS)
+	await _shadow_walk_to(MEET_SHADOW_X)
+
+func _shadow_return_and_open() -> void:
+	await _shadow_walk_to(SHADOW_POS.x)
+	var spr: AnimatedSprite2D = shadow.sprite if shadow else null
+	if spr:
+		spr.flip_h = true
+	await exit_portal.open(0.8)
+	if spr:
+		spr.flip_h = false
+
+func _shadow_vanish() -> void:
+	if shadow == null:
+		return
+	var t := create_tween().set_parallel(true)
+	t.tween_property(shadow, "modulate:a", 0.0, 0.7)
+	t.tween_property(shadow, "scale", Vector2(0.7, 1.25), 0.7)
+	await t.finished
+
+# ---------------------------------------------------------------- alur
 
 func _arrive() -> void:
 	var k = _find_player()
 	if k:
 		k.set_movement_enabled(false)
 		k.modulate.a = 0.0
-		k.face_left(false)
+		k.face_left(true)
+		k.global_position = ARRIVE_PORTAL + Vector2(-6, -10)
+	_snap_camera()
 	await get_tree().create_timer(0.3).timeout
 	await arrive_portal.open(0.5)
 	if k:
-		k.global_position = ARRIVE_PORTAL + Vector2(6, -10)
 		var t := create_tween().set_parallel(true)
 		t.tween_property(k, "modulate:a", 1.0, 0.25)
-		t.tween_property(k, "global_position", Vector2(ARRIVE_PORTAL.x + 28, FLOOR_Y), 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		t.tween_property(k, "global_position", Vector2(ARRIVE_PORTAL.x - 30, LANE_Y), 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		await t.finished
+		k.reset_air()
 		k.set_movement_enabled(true)
 	arrive_portal.close(0.5)
 	_hint("A / D  jalan      Spasi / W  lompat", 5.0)
 
 func _talk() -> void:
-	if talked:
-		return
-	talked = true
 	var k = _find_player()
 	if k:
-		k.face_left(false)
+		k.face_left(true)
 	var dm = _dm()
 	if dm == null:
 		return
@@ -176,25 +282,13 @@ func _mission() -> void:
 	if k == null or dm == null:
 		return
 	k.set_movement_enabled(false)
-	shadow = FollowerScript.new()
-	add_child(shadow)
-	shadow.setup(k)
-	shadow.active = false
-	shadow.global_position = k.global_position + Vector2(-34, 0)
-	var am = get_node_or_null("/root/AudioManager")
-	if am:
-		am.play_sfx("rewind", 0.7, -8.0)
-	shadow.scale = Vector2(0.6, 1.3)
-	await create_tween().tween_property(shadow, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT).finished
-	k.face_left(true)
+	# Bayangan menghampiri dulu, baru bicara; lalu kembali dan membuka portal di pulau kiri.
+	await _shadow_come()
 	await dm.play_lines(dm.flow("mission/lines"), "mission")
 	k.set_movement_enabled(false)
-	# Bayangan membuka portal di ujung kanan.
-	await exit_portal.open(0.8)
-	shadow.active = true
+	await _shadow_return_and_open()
 	k.set_movement_enabled(true)
-	k.face_left(false)
-	_hint("Masuk ke portal", 5.0)
+	_hint("Masuk ke portal di pulau kiri", 5.0)
 
 func _wake() -> void:
 	var k = _find_player()
@@ -203,8 +297,10 @@ func _wake() -> void:
 	if k == null or dm == null:
 		return
 	k.set_movement_enabled(false)
-	k.global_position = Vector2(MBOK_POS.x - 46, FLOOR_Y)
-	k.face_left(false)
+	k.global_position = Vector2(MBOK_POS.x + 40, LANE_Y)
+	k.reset_air()
+	k.face_left(true)
+	_snap_camera()
 	k.modulate = Color(0.3, 0.3, 0.4, 0.0)
 	await create_tween().tween_property(k, "modulate", Color.WHITE, 1.4).set_trans(Tween.TRANS_SINE).finished
 	await dm.play_lines(dm.flow("mbok_wake/lines"))
@@ -223,22 +319,18 @@ func _wake() -> void:
 	if gs:
 		gs.set_energy(100)
 	k.set_movement_enabled(false)
-	shadow = FollowerScript.new()
-	add_child(shadow)
-	shadow.setup(k)
-	shadow.active = false
-	shadow.global_position = k.global_position + Vector2(-34, 0)
+	await _shadow_come()
 	var b = dm.bubble(shadow, dm.flow("mbok_wake/shadow"), "speech", -1.0, Vector2(0, -60))
-	await exit_portal.open(0.8)
 	if b:
 		await b.finished
-	shadow.active = true
+	await _shadow_return_and_open()
 	k.set_movement_enabled(true)
-	_hint("Masuk ke portal untuk kembali", 5.0)
+	_hint("Masuk ke portal di pulau kiri untuk kembali", 5.0)
 	print("[WAKE] energy ", gs.stability if gs else -1, " heavy ", gs.has_heavy_legs() if gs else false, " portal open ", exit_portal.is_open)
 
 func _on_exit_portal() -> void:
 	exit_portal.enterable = false
+	_shadow_vanish()
 	RoomManager.change_room("P1", true)
 
 # ---------------------------------------------------------------- uji otomatis (CLI --autotest)
@@ -246,6 +338,7 @@ func _on_exit_portal() -> void:
 func _autotest_choice() -> void:
 	# Menampilkan kotak dialog + pilihan makan supaya tata letak bisa dicek lewat screenshot.
 	var dm = _dm()
+	talked = true
 	await get_tree().create_timer(0.5).timeout
 	var intro: Array = dm.flow("mbok_luna/intro")
 	dm.dialog_box.show_line("penjual", intro[6]["text"], "biasa")

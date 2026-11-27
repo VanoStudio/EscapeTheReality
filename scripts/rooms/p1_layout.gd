@@ -82,7 +82,20 @@ const LEVEL := [
 const PAPERS := [Vector2(85, 1012), Vector2(925, 822), Vector2(175, 632), Vector2(835, 372)]
 # Awal tiap tingkat (juga titik masuk saat kembali dari Mbok Luna).
 const TIER_STARTS := [Vector2(930, 1080), Vector2(130, 880), Vector2(900, 690), Vector2(130, 500)]
-const LANTERNS := TIER_STARTS
+# Checkpoint berurutan sesuai progres (lentera awal tingkat, lentera tengah tingkat, lokasi pecahan).
+# Checkpoint hanya maju, tidak pernah mundur walau Kirana jatuh ke tingkat bawah.
+const CHECKPOINTS := [
+	Vector2(930, 1080), Vector2(295, 1035), Vector2(90, 1040),
+	Vector2(130, 880), Vector2(750, 860), Vector2(925, 850),
+	Vector2(900, 690), Vector2(400, 690), Vector2(175, 660),
+	Vector2(130, 500), Vector2(640, 420), Vector2(835, 400),
+]
+const PAPER_CHECKPOINT := [2, 5, 8, 11]   # indeks checkpoint milik tiap pecahan
+const LANTERNS := [Vector2(930, 1080), Vector2(295, 1035), Vector2(130, 880), Vector2(750, 860),
+	Vector2(900, 690), Vector2(400, 690), Vector2(130, 500), Vector2(640, 420)]
+const DEEP_FALL := 140.0       # jatuh lebih dari ini di bawah checkpoint = ditarik kembali
+const DMG_RECALL := 5          # tahan R: kembali ke checkpoint
+const RECALL_HOLD := 0.7
 # [posisi, ukuran, patroli, kecepatan]
 const TRAUMAS := [
 	[Vector2(555, 1065), Vector2(30, 24), Vector2.ZERO, 0.0],
@@ -105,9 +118,24 @@ const ASSISTS := [
 	[Vector2(790, 706), Vector2(345, 700)],
 	[Vector2(582, 452), Vector2(722, 432)],
 ]
+# Gerbang gema K1-K7 (percakapan dunia lain). wall = kaki dinding, trigger = area pemicu (dunia).
+const ECHO_GATES := [
+	{"id": "K1", "wall": Vector2(720, 1075), "h": 110.0, "trigger": Rect2(736, 1035, 22, 40)},
+	{"id": "K2", "wall": Vector2(150, 1040), "h": 70.0, "trigger": Rect2(166, 1005, 36, 35)},
+	{"id": "K3", "wall": Vector2(760, 860), "h": 110.0, "trigger": Rect2(686, 820, 50, 40)},
+	{"id": "K4", "wall": Vector2(905, 850), "h": 70.0, "trigger": Rect2(878, 815, 18, 35)},
+	{"id": "K5", "wall": Vector2(840, 690), "h": 110.0, "trigger": Rect2(852, 650, 40, 40)},
+	{"id": "K6", "wall": Vector2(380, 690), "h": 110.0, "trigger": Rect2(400, 650, 36, 40)},
+	{"id": "K7", "wall": Vector2(325, 500), "h": 110.0, "trigger": Rect2(276, 460, 30, 40)},
+]
+# Energi saat menjawab gerbang gema: hanya Jujur yang membuka gerbang.
+const ECHO_ENERGY := {"jujur": 10, "pendam": -5, "sindir": -10, "ledak": -15}
 const FINAL_PORTAL := Vector2(640, 285)
 # Pemicu finale hanya tepat di depan portal (bukan seluruh puncak).
-const FINALE_ZONE := Rect2(628, 235, 52, 50)
+const FINALE_ZONE := Rect2(735, 235, 50, 50)
+# Panggung finale: Kirana berhenti di sini, bayangan Adik berdiri di antara Kirana dan portal.
+const FINALE_KIRANA_X := 760.0
+const FINALE_SHADOW_X := 690.0
 
 static func tier_of(y: float) -> int:
 	if y > 960.0:

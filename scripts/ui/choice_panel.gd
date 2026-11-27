@@ -1,6 +1,9 @@
 class_name ChoicePanel
 extends Control
 
+const ChoiceStyleScript := preload("res://scripts/ui/choice_style.gd")
+const ChoiceCardScript := preload("res://scripts/ui/choice_card.gd")
+
 signal choice_selected(choice_data: Dictionary)
 
 @export var button_container: VBoxContainer
@@ -50,6 +53,12 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_active:
 		return
+	if (event.is_action_pressed("ui_down") or event.is_action_pressed("ui_up")) and buttons.size() > 0:
+		var focused := get_viewport().gui_get_focus_owner()
+		if not (focused in buttons):
+			buttons[0 if event.is_action_pressed("ui_down") else buttons.size() - 1].grab_focus()
+			get_viewport().set_input_as_handled()
+			return
 		
 	# Tombol numerik 1-4
 	if event.is_action_pressed("choice_1") and buttons.size() >= 1:
@@ -100,82 +109,55 @@ func show_choices(choices: Array, arg2: Variant = 0, arg3: Variant = null) -> vo
 		timer_bar.max_value = time_limit
 		timer_bar.value = time_limit
 		
-	# Buat 4 tombol dengan banner bergaya steampunk
+	# Kotak pilihan baru (ChoiceCard): gaya dari data/choice_style.tres, bisa diatur di Inspector.
+	var st := ChoiceStyleScript.load_default()
+	_layout_container(st)
 	for i in range(current_choices.size()):
 		var c = current_choices[i]
-		var btn = Button.new()
-		btn.text = "%d. %s" % [i + 1, c.get("text", "")]
-		btn.custom_minimum_size = Vector2(780, 78)
-		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		
-		var ctype = c.get("type", "").to_lower()
-		_style_choice_button(btn, ctype, tier)
-		
+		var btn = ChoiceCardScript.new()
+		btn.setup(st, String(c.get("text", "")), i + 1)
+		var ctype = String(c.get("type", "")).to_lower()
+		_apply_tier(btn, ctype, tier)
 		btn.pressed.connect(_on_button_pressed.bind(c))
 		button_container.add_child(btn)
 		buttons.append(btn)
-		
+		# Muncul satu per satu dari kanan.
+		if is_inside_tree():
+			var target_mod: Color = btn.modulate
+			btn.modulate.a = 0.0
+			var tw := btn.create_tween()
+			tw.tween_interval(st.appear_stagger * i)
+			tw.tween_property(btn, "modulate:a", target_mod.a, 0.22)
+
 	is_active = true
 	visible = true
-	if buttons.size() > 0 and is_inside_tree():
-		buttons[0].grab_focus()
+	# Tidak ada tombol yang disorot duluan (dulu tombol pertama terlihat seperti "jawaban benar").
+	# Fokus keyboard baru muncul saat pemain menekan panah; angka 1-4 tetap bisa dipakai.
+	if is_inside_tree() and get_viewport().gui_get_focus_owner():
+		get_viewport().gui_get_focus_owner().release_focus()
 
-func _style_choice_button(btn: Button, ctype: String, tier: int) -> void:
-	var tex_normal = load("res://assets/processed/ui/choice_banner.png")
-	var tex_hover = load("res://assets/processed/ui/choice_banner_hover.png")
-	
-	if tex_normal:
-		var style_n = StyleBoxTexture.new()
-		style_n.texture = tex_normal
-		style_n.texture_margin_left = 32
-		style_n.texture_margin_right = 32
-		style_n.texture_margin_top = 16
-		style_n.texture_margin_bottom = 16
-		style_n.content_margin_left = 66
-		style_n.content_margin_right = 36
-		style_n.content_margin_top = 12
-		style_n.content_margin_bottom = 12
-		btn.add_theme_stylebox_override("normal", style_n)
-		
-	if tex_hover:
-		var style_h = StyleBoxTexture.new()
-		style_h.texture = tex_hover
-		style_h.texture_margin_left = 32
-		style_h.texture_margin_right = 32
-		style_h.texture_margin_top = 16
-		style_h.texture_margin_bottom = 16
-		style_h.content_margin_left = 66
-		style_h.content_margin_right = 36
-		style_h.content_margin_top = 12
-		style_h.content_margin_bottom = 12
-		btn.add_theme_stylebox_override("hover", style_h)
-		btn.add_theme_stylebox_override("focus", style_h)
-		btn.add_theme_stylebox_override("pressed", style_h)
+func _layout_container(st: ChoiceStyle) -> void:
+	if button_container == null:
+		return
+	button_container.add_theme_constant_override("separation", int(st.gap))
+	button_container.alignment = BoxContainer.ALIGNMENT_END
+	button_container.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	button_container.offset_right = -st.right_margin
+	button_container.offset_left = -st.right_margin - st.card_width
+	button_container.offset_bottom = -st.bottom_above_dialog
+	button_container.offset_top = -st.bottom_above_dialog - 600.0
+	button_container.grow_vertical = Control.GROW_DIRECTION_BEGIN
 
-	btn.add_theme_color_override("font_color", Color(0.18, 0.14, 0.12, 1.0))
-	btn.add_theme_color_override("font_hover_color", Color(0.55, 0.15, 0.1, 1.0))
-	btn.add_theme_color_override("font_focus_color", Color(0.55, 0.15, 0.1, 1.0))
-	btn.add_theme_font_size_override("font_size", 30)
-	var bold_path := "res://assets/processed/fonts/comic_dialog_bold.ttf"
-	if ResourceLoader.exists(bold_path):
-		btn.add_theme_font_override("font", load(bold_path) as Font)
-
+func _apply_tier(btn: Control, ctype: String, tier: int) -> void:
 	match tier:
-		GameState.Tier.TENANG:
-			btn.modulate = Color(1, 1, 1, 1)
-		GameState.Tier.KESEL:
+		1:
 			if ctype == "jujur":
-				btn.modulate = Color(1, 1, 1, 0.75) # Pilihan Jujur sedikit pudar
-			else:
-				btn.modulate = Color(1, 1, 1, 1)
-		GameState.Tier.HAMPIR_MELEDAK:
+				btn.modulate = Color(1, 1, 1, 0.75)
+		2:
 			if ctype == "jujur":
-				btn.modulate = Color(1, 1, 1, 0.55) # Pilihan Jujur pudar
+				btn.modulate = Color(1, 1, 1, 0.55)
 			elif ctype == "ledak" or ctype == "pendam":
-				btn.modulate = Color(1.2, 0.8, 0.8, 1.0) # Tebal / bercahaya kemerahan
-			else:
-				btn.modulate = Color(1, 1, 1, 1)
+				btn.modulate = Color(1.2, 0.8, 0.8, 1.0)
 
 func _on_button_pressed(choice_data: Dictionary) -> void:
 	if not is_active:

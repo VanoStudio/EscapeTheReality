@@ -35,7 +35,18 @@ func setup(player: Node2D) -> void:
 	modulate = Color(1, 1, 1, 0.0)
 	global_position = player.global_position + FOLLOW_OFFSET
 	_build_wisps()
-	create_tween().tween_property(self, "modulate:a", 0.82, 1.2)
+	if start_visible:
+		fade_to(0.82, 1.2)
+
+## Bayangan tidak harus selalu terlihat: false = ikut dari jauh tapi tak tampak.
+var start_visible := true
+var _fade_tween: Tween
+
+func fade_to(alpha: float, dur: float = 0.5) -> void:
+	if _fade_tween and _fade_tween.is_valid():
+		_fade_tween.kill()
+	_fade_tween = create_tween()
+	_fade_tween.tween_property(self, "modulate:a", alpha, dur)
 
 func _build_wisps() -> void:
 	var p := CPUParticles2D.new()

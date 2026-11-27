@@ -26,9 +26,15 @@ var _total := 0
 var _blip := 0
 var _closing := false
 var _tip_local := Vector2.ZERO
+# Bubble yang sedang tampil: bubble baru menutup yang lama (tidak saling menimpa).
+static var _active: Array = []
 
 ## Tampilkan bubble di atas `who`. hold < 0 = otomatis dari panjang teks.
 static func say(who: Node2D, text: String, bubble_style: String = "speech", who_speaker: String = "kakak", hold: float = -1.0, offset: Vector2 = Vector2(0, -80)) -> WorldBubble:
+	for old in _active.duplicate():
+		if is_instance_valid(old):
+			old._close(0.18)
+	_active.clear()
 	var wb := WorldBubble.new()
 	wb.anchor = who
 	wb.style = bubble_style
@@ -38,6 +44,7 @@ static func say(who: Node2D, text: String, bubble_style: String = "speech", who_
 	var host: Node = who.get_tree().current_scene if who.get_tree().current_scene else who
 	host.add_child(wb)
 	wb._build(text)
+	_active.append(wb)
 	return wb
 
 func _build(text: String) -> void:
@@ -107,13 +114,14 @@ func skip_typing() -> void:
 	if _typing:
 		_progress = float(_total)
 
-func _close() -> void:
+func _close(dur: float = 0.25) -> void:
 	if _closing:
 		return
 	_closing = true
+	_active.erase(self)
 	if balloon:
 		var t := create_tween()
-		t.tween_property(balloon, "modulate:a", 0.0, 0.25)
+		t.tween_property(balloon, "modulate:a", 0.0, dur)
 		await t.finished
 	finished.emit()
 	queue_free()

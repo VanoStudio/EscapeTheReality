@@ -14,7 +14,8 @@ const COMIC_DATA_PATH := "res://data/comic.json"
 const BalloonScript := preload("res://scripts/comic/comic_balloon.gd")
 const BALLOON_PX_PER_UNIT := 240.0
 const TYPE_CHARS_PER_SEC := 38.0
-const SKIP_HOLD_SEC := 3.0
+const SKIP_HOLD_SEC := 1.0
+const SKIP_IDLE_HIDE := 4.0
 const PANEL_ENTER_SEC := 0.35
 const BALLOON_DELAY_SEC := 0.25
 
@@ -43,6 +44,8 @@ var blip_counter: int = 0
 var balloons_playing: bool = false
 var fast_forward: bool = false
 var esc_hold: float = 0.0
+var skip_idle: float = 0.0
+var skip_shown := false
 var shot_mode: bool = false
 
 # Kamera
@@ -304,7 +307,7 @@ func _build_ui() -> void:
 	ui.add_child(flash_rect)
 
 	hint_label = Label.new()
-	hint_label.text = "Klik / Enter  lanjut" if comic_id == "ending" else "Klik / Enter  lanjut     Tahan Esc  lewati"
+	hint_label.text = "Klik / Enter  lanjut"
 	hint_label.add_theme_font_size_override("font_size", 18)
 	hint_label.add_theme_color_override("font_color", Color(0.92, 0.88, 0.8, 0.55))
 	hint_label.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -316,24 +319,46 @@ func _build_ui() -> void:
 	hint_label.modulate.a = 0.0
 	ui.add_child(hint_label)
 
+	# Panel "E TO SKIP" (kanan bawah): muncul setelah pemain menekan Enter/klik,
+	# tahan E -> lingkaran terisi berputar -> lewati cerita, langsung ke gameplay.
 	skip_ring = Control.new()
-	skip_ring.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	skip_ring.offset_left = -96
-	skip_ring.offset_top = -132
-	skip_ring.offset_right = -36
-	skip_ring.offset_bottom = -72
+	skip_ring.position = Vector2(1920 - 36 - 270, 1080 - 150)
+	skip_ring.size = Vector2(270, 76)
 	skip_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	skip_ring.draw.connect(_draw_skip_ring)
-	skip_ring.visible = false
+	skip_ring.modulate.a = 0.0
 	ui.add_child(skip_ring)
 
 func _draw_skip_ring() -> void:
-	var c := skip_ring.size * 0.5
-	var r: float = min(c.x, c.y) - 4.0
-	skip_ring.draw_arc(c, r, 0, TAU, 48, Color(1, 1, 1, 0.18), 4.0, true)
-	var p: float = clamp(esc_hold / SKIP_HOLD_SEC, 0.0, 1.0)
+	var sz := skip_ring.size
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.05, 0.03, 0.07, 0.72)
+	bg.set_corner_radius_all(int(sz.y * 0.5))
+	bg.border_color = Color(1.0, 0.86, 0.6, 0.35)
+	bg.set_border_width_all(2)
+	skip_ring.draw_style_box(bg, Rect2(Vector2.ZERO, sz))
+	var c := Vector2(sz.y * 0.5 + 4.0, sz.y * 0.5)
+	var r := sz.y * 0.5 - 12.0
+	var p: float = clampf(esc_hold / SKIP_HOLD_SEC, 0.0, 1.0)
+	skip_ring.draw_circle(c, r - 3.0, Color(1, 1, 1, 0.08 + 0.25 * p))
+	skip_ring.draw_arc(c, r, 0, TAU, 48, Color(1, 1, 1, 0.25), 4.0, true)
 	if p > 0.0:
-		skip_ring.draw_arc(c, r, -PI * 0.5, -PI * 0.5 + TAU * p, 48, Color(1, 0.86, 0.6, 0.95), 4.0, true)
+		# Lingkaran terisi berputar searah jarum jam.
+		skip_ring.draw_arc(c, r, -PI * 0.5 + time_acc * 2.0, -PI * 0.5 + time_acc * 2.0 + TAU * p, 48, Color(1, 0.86, 0.6, 1.0), 5.0, true)
+	var f: Font = ThemeDB.fallback_font
+	var bold := "res://assets/processed/fonts/comic_dialog_bold.ttf"
+	if ResourceLoader.exists(bold):
+		f = load(bold) as Font
+	skip_ring.draw_string(f, c + Vector2(-10, 11), "E", HORIZONTAL_ALIGNMENT_LEFT, -1, 30, Color(1, 0.95, 0.85))
+	skip_ring.draw_string(f, Vector2(sz.y + 14.0, sz.y * 0.5 + 11.0), "TO SKIP", HORIZONTAL_ALIGNMENT_LEFT, -1, 30, Color(1, 0.95, 0.85, 0.95))
+
+func _show_skip_prompt() -> void:
+	if comic_id != "opening" or finished:
+		return
+	skip_idle = 0.0
+	if not skip_shown:
+		skip_shown = true
+		create_tween().tween_property(skip_ring, "modulate:a", 1.0, 0.3)
 
 func _build_pages() -> void:
 	for pi in range(page_defs.size()):
@@ -561,11 +586,19 @@ func _fade_ambience(target_db: float, dur: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if shot_mode or finished:
 		return
-	var advance := event.is_action_pressed("interact") or event.is_action_pressed("ui_accept") or event.is_action_pressed("jump")
+	# E dipakai untuk "tahan untuk skip", jadi tidak membalik panel.
+	if event.is_action_pressed("interact") and comic_id == "opening":
+		_show_skip_prompt()
+		get_viewport().set_input_as_handled()
+		return
+	var advance := event.is_action_pressed("ui_accept") or event.is_action_pressed("jump")
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		advance = true
+	if comic_id != "opening" and event.is_action_pressed("interact"):
 		advance = true
 	if advance:
 		get_viewport().set_input_as_handled()
+		_show_skip_prompt()
 		_next()
 
 func _process(delta: float) -> void:
@@ -577,15 +610,21 @@ func _process(delta: float) -> void:
 func _update_skip(delta: float) -> void:
 	if comic_id != "opening" or shot_mode or finished:
 		return
-	if Input.is_key_pressed(KEY_ESCAPE) or Input.is_action_pressed("skip"):
+	if Input.is_key_pressed(KEY_E):
+		_show_skip_prompt()
 		esc_hold += delta
-		skip_ring.visible = true
 		skip_ring.queue_redraw()
 		if esc_hold >= SKIP_HOLD_SEC:
 			_finish(true)
-	elif esc_hold > 0.0:
-		esc_hold = 0.0
-		skip_ring.visible = false
+		return
+	if esc_hold > 0.0:
+		esc_hold = maxf(esc_hold - delta * 3.0, 0.0)
+		skip_ring.queue_redraw()
+	if skip_shown:
+		skip_idle += delta
+		if skip_idle >= SKIP_IDLE_HIDE:
+			skip_shown = false
+			create_tween().tween_property(skip_ring, "modulate:a", 0.0, 0.5)
 
 func _next() -> void:
 	if finished:
@@ -1134,7 +1173,7 @@ func _finish(skipped: bool = false) -> void:
 	finished = true
 	_stop_tremble()
 	_finish_typing()
-	skip_ring.visible = false
+	create_tween().tween_property(skip_ring, "modulate:a", 0.0, 0.3)
 	create_tween().tween_property(hint_label, "modulate:a", 0.0, 0.3)
 	if data.has("outro"):
 		await _play_outro(data["outro"])

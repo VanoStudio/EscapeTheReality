@@ -282,5 +282,466 @@
       "text": "Ayo, kita coba lagi. Pecahan yang sudah kamu dapat masih ada.",
       "draft": true
     }
+  },
+  "echo": {
+    "_info": "Percakapan_Dunia_Lain_Kirana_Adik.pdf (teks persis). Hanya Jujur yang membuka gerbang; 'outcome' = catatan penulis untuk efek visual, tidak ditampilkan.",
+    "K1": {
+      "title": "K1: Lorong yang Mengulang",
+      "room_ref": "F1",
+      "scene": "Kirana berjalan melewati lorong yang seharusnya lurus, tetapi setiap beberapa langkah ia kembali ke tempat yang sama. Dari ujung lorong terdengar suara adiknya.",
+      "rounds": [
+        {
+          "speaker": "suara_adik",
+          "question": "Kakak selalu bilang nanti. Tapi kapan 'nanti' itu?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Aku sering bilang nanti karena aku nggak tahu harus menghadapi kamu sekarang."
+            },
+            {
+              "type": "pendam",
+              "text": "Aku nggak mau bahas ini."
+            },
+            {
+              "type": "sindir",
+              "text": "Kamu juga nggak pernah sabar nunggu."
+            },
+            {
+              "type": "ledak",
+              "text": "Aku bilang nanti karena aku memang lagi nggak mau dengar!"
+            }
+          ]
+        },
+        {
+          "speaker": "suara_adik",
+          "question": "Berarti aku harus terus nunggu sampai Kakak siap?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Nggak. Aku yang harus belajar buat ngomong, bukan terus nyuruh kamu menunggu."
+            },
+            {
+              "type": "pendam",
+              "text": "Entahlah. Aku nggak tahu."
+            },
+            {
+              "type": "sindir",
+              "text": "Kalau nggak mau nunggu, ya jangan."
+            },
+            {
+              "type": "ledak",
+              "text": "Aku juga nggak bisa selalu ngikutin maumu!"
+            }
+          ]
+        }
+      ],
+      "outcome": "Jika memilih selain Jujur, lorong kembali berputar dan Kirana kembali ke awal."
+    },
+    "K2": {
+      "title": "K2: Jam yang Berhenti",
+      "room_ref": "F2",
+      "scene": "Sebuah jam besar menggantung di tengah ruangan. Jarumnya berhenti tepat pada waktu pertengkaran mereka. Terdengar suara adiknya dari balik jam.",
+      "rounds": [
+        {
+          "speaker": "adik",
+          "question": "Kakak masih berharap malam itu nggak pernah terjadi?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Iya. Kalau bisa, aku ingin mengulangnya dan bicara dengan lebih baik."
+            },
+            {
+              "type": "pendam",
+              "text": "Sudahlah. Itu sudah lewat."
+            },
+            {
+              "type": "sindir",
+              "text": "Kamu juga pasti senang kalau bisa mengulangnya."
+            },
+            {
+              "type": "ledak",
+              "text": "Aku nggak mau ingat malam itu lagi!"
+            }
+          ]
+        },
+        {
+          "speaker": "adik",
+          "question": "Tapi kalau malam itu dihapus, apa yang berubah?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Mungkin nggak ada. Karena yang perlu berubah bukan masa lalunya, tapi caraku menghadapi semuanya."
+            },
+            {
+              "type": "pendam",
+              "text": "Aku nggak tahu."
+            },
+            {
+              "type": "sindir",
+              "text": "Kamu yang bikin semuanya terjadi, kan?"
+            },
+            {
+              "type": "ledak",
+              "text": "Berhenti nyalahin aku!"
+            }
+          ]
+        }
+      ],
+      "outcome": "Jika Jujur dipilih, jarum jam mulai bergerak kembali."
+    },
+    "K3": {
+      "title": "K3: Rumah yang Terbalik",
+      "room_ref": "F3",
+      "scene": "Kirana memasuki rumah yang seluruh ruangannya terbalik. Foto-foto dirinya dan adiknya tergantung di langit-langit. Suara adiknya terdengar dari bawah.",
+      "rounds": [
+        {
+          "speaker": "adik",
+          "question": "Kakak selalu merasa Kakak harus kuat sendirian.",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Aku memang sering merasa begitu. Aku takut kalau cerita, semuanya malah tambah berat."
+            },
+            {
+              "type": "pendam",
+              "text": "Aku baik-baik saja."
+            },
+            {
+              "type": "sindir",
+              "text": "Memangnya ada yang bisa bantu aku?"
+            },
+            {
+              "type": "ledak",
+              "text": "Aku nggak butuh siapa-siapa!"
+            }
+          ]
+        },
+        {
+          "speaker": "adik",
+          "question": "Aku kan nggak pernah bilang Kakak harus kuat sendirian.",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Aku tahu. Itu cuma ketakutanku sendiri."
+            },
+            {
+              "type": "pendam",
+              "text": "Sudah, jangan dibahas."
+            },
+            {
+              "type": "sindir",
+              "text": "Sekarang gampang ngomongnya."
+            },
+            {
+              "type": "ledak",
+              "text": "Kamu nggak tahu apa yang aku rasain!"
+            }
+          ]
+        }
+      ],
+      "outcome": "Jika Jujur, rumah perlahan kembali berputar ke posisi normal."
+    },
+    "K4": {
+      "title": "K4: Bayangan yang Menyerupai Adik",
+      "room_ref": "F4",
+      "scene": "Kirana melihat sosok adiknya berdiri di ujung ruangan. Ketika didekati, sosok itu berubah menjadi bayangan hitam.",
+      "rounds": [
+        {
+          "speaker": "bayangan_adik",
+          "question": "Kakak sebenarnya marah sama aku, atau sama dirinya sendiri?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Mungkin dua-duanya. Aku marah sama kamu, tapi aku juga nyesel sama caraku memperlakukan kamu."
+            },
+            {
+              "type": "pendam",
+              "text": "Aku cuma marah sama keadaan."
+            },
+            {
+              "type": "sindir",
+              "text": "Kamu pintar juga sekarang, bisa baca pikiranku."
+            },
+            {
+              "type": "ledak",
+              "text": "Jangan sok tahu tentang aku!"
+            }
+          ]
+        },
+        {
+          "speaker": "bayangan_adik",
+          "question": "Kalau begitu, kenapa Kakak terus menyalahkan aku?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Karena lebih mudah menyalahkan orang lain daripada mengakui kalau aku juga salah."
+            },
+            {
+              "type": "pendam",
+              "text": "Aku nggak tahu."
+            },
+            {
+              "type": "sindir",
+              "text": "Karena kamu memang salah."
+            },
+            {
+              "type": "ledak",
+              "text": "Karena kamu yang mulai semuanya!"
+            }
+          ]
+        }
+      ],
+      "outcome": "Jika Jujur, bayangan mulai kehilangan bentuk dan berubah menjadi cahaya kecil."
+    },
+    "K5": {
+      "title": "K5: Ruang Makan yang Kosong",
+      "room_ref": "F5",
+      "scene": "Kirana masuk ke ruang makan. Dua kursi ada di sana, tetapi hanya satu yang memiliki makanan. Kursi di seberangnya kosong.",
+      "rounds": [
+        {
+          "speaker": "suara_adik",
+          "question": "Dulu kita sering makan bareng. Sekarang Kakak bahkan nggak pernah duduk di sini.",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Aku kangen juga. Aku cuma nggak tahu bagaimana caranya kembali seperti dulu."
+            },
+            {
+              "type": "pendam",
+              "text": "Itu kan cuma makan."
+            },
+            {
+              "type": "sindir",
+              "text": "Kamu masih ingat hal kecil begitu?"
+            },
+            {
+              "type": "ledak",
+              "text": "Aku nggak punya waktu buat hal kayak gitu!"
+            }
+          ]
+        },
+        {
+          "speaker": "suara_adik",
+          "question": "Aku nggak minta kembali seperti dulu. Aku cuma mau mulai lagi.",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Kalau begitu... aku mau coba mulai lagi juga."
+            },
+            {
+              "type": "pendam",
+              "text": "Nanti kita lihat."
+            },
+            {
+              "type": "sindir",
+              "text": "Gampang banget ngomongnya."
+            },
+            {
+              "type": "ledak",
+              "text": "Kamu kira semuanya bisa selesai begitu aja?!"
+            }
+          ]
+        }
+      ],
+      "outcome": "Jika Jujur, makanan di meja perlahan muncul menjadi dua porsi."
+    },
+    "K6": {
+      "title": "K6: Taman yang Kehilangan Warna",
+      "room_ref": "F6",
+      "scene": "Kirana tiba di taman yang seluruh warnanya pudar. Setiap kali ia mengingat pertengkaran mereka, satu bagian taman berubah menjadi abu-abu.",
+      "rounds": [
+        {
+          "speaker": "adik",
+          "question": "Kenapa Kakak cuma ingat hal yang bikin Kakak marah?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Karena aku terlalu fokus sama sakitnya sampai lupa kalau ada banyak hal baik juga di antara kita."
+            },
+            {
+              "type": "pendam",
+              "text": "Aku nggak ingat apa-apa."
+            },
+            {
+              "type": "sindir",
+              "text": "Karena yang kamu lakukan memang susah dilupakan."
+            },
+            {
+              "type": "ledak",
+              "text": "Karena kamu yang bikin aku ingat terus!"
+            }
+          ]
+        },
+        {
+          "speaker": "adik",
+          "question": "Terus kenapa hal baiknya nggak pernah Kakak ceritain?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Karena aku kira hal baik itu nggak perlu diucapkan. Ternyata aku salah."
+            },
+            {
+              "type": "pendam",
+              "text": "Nggak penting."
+            },
+            {
+              "type": "sindir",
+              "text": "Mau dengar cerita lama sekarang?"
+            },
+            {
+              "type": "ledak",
+              "text": "Aku nggak mau cerita!"
+            }
+          ]
+        }
+      ],
+      "outcome": "Jika Jujur, warna mulai kembali ke taman."
+    },
+    "K7": {
+      "title": "K7: Cermin yang Retak",
+      "room_ref": "F7",
+      "scene": "Kirana berdiri di depan cermin besar. Di dalam pantulannya, ia melihat dirinya sendiri sedang bertengkar dengan adiknya.",
+      "rounds": [
+        {
+          "speaker": "adik_cermin",
+          "question": "Kalau Kakak bisa bicara lagi dengan aku malam itu, apa yang mau Kakak bilang?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Aku minta maaf. Aku marah, tapi seharusnya aku nggak melampiaskannya ke kamu."
+            },
+            {
+              "type": "pendam",
+              "text": "Nggak ada yang perlu dikatakan."
+            },
+            {
+              "type": "sindir",
+              "text": "Mungkin aku akan bilang kamu jangan mulai dulu."
+            },
+            {
+              "type": "ledak",
+              "text": "Aku akan bilang kamu harusnya dengar aku!"
+            }
+          ]
+        },
+        {
+          "speaker": "adik_cermin",
+          "question": "Cuma itu?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Dan aku ingin kamu tahu kalau sebenarnya aku sayang sama kamu. Aku cuma nggak pandai menunjukkannya."
+            },
+            {
+              "type": "pendam",
+              "text": "Iya. Cuma itu."
+            },
+            {
+              "type": "sindir",
+              "text": "Memangnya kurang?"
+            },
+            {
+              "type": "ledak",
+              "text": "Kamu maunya apa lagi?!"
+            }
+          ]
+        }
+      ],
+      "outcome": "Jika Jujur, retakan pada cermin perlahan menyatu."
+    },
+    "K8": {
+      "title": "K8: Pertemuan Terakhir dengan Bayangan",
+      "room_ref": "",
+      "scene": "Kirana akhirnya bertemu dengan bayangan adiknya di tengah dunia yang mulai runtuh. Tidak ada lagi tempat untuk bersembunyi atau mengulang kejadian.",
+      "rounds": [
+        {
+          "speaker": "bayangan_adik",
+          "question": "Kalau Kakak bisa mengulang semuanya, Kakak mau mengubah apa?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Aku nggak bisa mengubah apa yang sudah terjadi. Tapi aku bisa memilih untuk nggak mengulang kesalahan yang sama."
+            },
+            {
+              "type": "pendam",
+              "text": "Aku nggak tahu."
+            },
+            {
+              "type": "sindir",
+              "text": "Mungkin aku akan memilih adik yang lebih gampang diajak bicara."
+            },
+            {
+              "type": "ledak",
+              "text": "Aku akan menghindari semuanya dari awal!"
+            }
+          ]
+        },
+        {
+          "speaker": "bayangan_adik",
+          "question": "Berarti Kakak akhirnya mengerti?",
+          "choices": [
+            {
+              "type": "jujur",
+              "text": "Aku mungkin belum sepenuhnya mengerti kamu. Tapi sekarang aku mau mulai mendengarkan."
+            },
+            {
+              "type": "pendam",
+              "text": "Iya."
+            },
+            {
+              "type": "sindir",
+              "text": "Iya, iya. Puas?"
+            },
+            {
+              "type": "ledak",
+              "text": "Aku sudah bilang aku mengerti!"
+            }
+          ]
+        }
+      ],
+      "outcome": "Jika pemain memilih Jujur, bayangan tersenyum dan berkata: \"Itu sudah cukup, Kak.\" Jam mulai berdetak. Dunia lain perlahan menghilang dan Kirana kembali ke dunia nyata.",
+      "closing": {
+        "speaker": "bayangan_adik",
+        "text": "Itu sudah cukup, Kak."
+      }
+    }
+  },
+  "echo_bridge": {
+    "_info": "Bisikan Bayangan (milik Kirana) sebelum tiap gerbang gema, menghubungkan naskah PDF dengan dunia pulau melayang. Semua draft.",
+    "K1": {
+      "speaker": "bayangan",
+      "text": "Dengar... itu suara Adik. Dari balik kabut ini.",
+      "draft": true
+    },
+    "K2": {
+      "speaker": "bayangan",
+      "text": "Kabut ini menyimpan malam itu. Adik menunggumu di sana.",
+      "draft": true
+    },
+    "K3": {
+      "speaker": "bayangan",
+      "text": "Ada yang mau Adik bilang. Kali ini, dengarkan dulu.",
+      "draft": true
+    },
+    "K4": {
+      "speaker": "bayangan",
+      "text": "Hati-hati. Itu bukan Adik... itu cuma bayangannya.",
+      "draft": true
+    },
+    "K5": {
+      "speaker": "bayangan",
+      "text": "Ingat meja makan di rumah? Suara itu datang dari sana.",
+      "draft": true
+    },
+    "K6": {
+      "speaker": "bayangan",
+      "text": "Kabutnya abu-abu. Seperti caramu mengingat Adik akhir-akhir ini.",
+      "draft": true
+    },
+    "K7": {
+      "speaker": "bayangan",
+      "text": "Kabut ini memantulkan malam itu, seperti cermin.",
+      "draft": true
+    }
   }
 }

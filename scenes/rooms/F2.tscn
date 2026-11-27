@@ -17,10 +17,10 @@ position = Vector2(240, 135)
 zoom = Vector2(4, 4)
 
 [node name="SpawnLeft" type="Marker2D" parent="."]
-position = Vector2(46, 113)
+position = Vector2(440, 135)
 
 [node name="SpawnRight" type="Marker2D" parent="."]
-position = Vector2(420, 113)
+position = Vector2(440, 135)
 
 [node name="Kirana" parent="." instance=ExtResource("3_kirana")]
-position = Vector2(46, 113)
+position = Vector2(440, 135)

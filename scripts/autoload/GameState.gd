@@ -27,6 +27,8 @@ var food_answered: bool = false
 var papers: Array[int] = []
 var parkour_started: bool = false
 var wake_pending: bool = false
+var echo_done: Array = []          # gerbang gema yang sudah dijawab jujur
+var checkpoint_idx: int = 0        # checkpoint parkour terjauh
 
 func _init() -> void:
 	load_tuning()
@@ -53,6 +55,8 @@ func reset_state() -> void:
 	papers.clear()
 	parkour_started = false
 	wake_pending = false
+	echo_done.clear()
+	checkpoint_idx = 0
 
 func get_tier() -> int:
 	if tuning == null:

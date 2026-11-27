@@ -20,7 +20,8 @@ static func run_all_tests() -> Dictionary:
 		Callable(M5Test, "test_parkour_jumps_reachable"),
 		Callable(M5Test, "test_energy_drain"),
 		Callable(M5Test, "test_rework2_assets"),
-		Callable(M5Test, "test_menu_and_credits")
+		Callable(M5Test, "test_menu_and_credits"),
+		Callable(M5Test, "test_echo_conversations")
 	]
 	for t in tests:
 		var name: String = t.get_method()
@@ -273,4 +274,36 @@ static func test_menu_and_credits() -> String:
 			return "missing menu layer " + f
 	if not ResourceLoader.exists("res://scenes/credits.tscn"):
 		return "credits scene missing"
+	return ""
+
+static func test_echo_conversations() -> String:
+	var f := _flow()
+	var echo: Dictionary = f.get("echo", {})
+	for id in ["K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8"]:
+		if not echo.has(id):
+			return "missing echo " + id
+		var rounds: Array = echo[id]["rounds"]
+		if rounds.size() != 2:
+			return id + " must have 2 rounds"
+		for r in rounds:
+			var types: Array = []
+			for c in r["choices"]:
+				types.append(c["type"])
+			types.sort()
+			if types != ["jujur", "ledak", "pendam", "sindir"]:
+				return id + " needs jujur/pendam/sindir/ledak choices"
+	# Teks persis PDF (contoh).
+	if echo["K1"]["rounds"][0]["question"] != "Kakak selalu bilang nanti. Tapi kapan 'nanti' itu?":
+		return "K1 question differs from PDF"
+	if echo["K8"]["closing"]["text"] != "Itu sudah cukup, Kak.":
+		return "K8 closing differs from PDF"
+	if echo["K7"]["rounds"][1]["choices"][0]["text"] != "Dan aku ingin kamu tahu kalau sebenarnya aku sayang sama kamu. Aku cuma nggak pandai menunjukkannya.":
+		return "K7 jujur text differs from PDF"
+	var ids: Array = []
+	for g in ParkourScript.ECHO_GATES:
+		ids.append(g["id"])
+	if ids != ["K1", "K2", "K3", "K4", "K5", "K6", "K7"]:
+		return "parkour must place gates K1..K7 in order"
+	if ParkourScript.CHECKPOINTS.size() != 12 or ParkourScript.PAPER_CHECKPOINT.size() != 4:
+		return "checkpoint table incomplete"
 	return ""

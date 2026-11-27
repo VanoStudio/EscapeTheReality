@@ -26,6 +26,7 @@ func _ready() -> void:
 	_build_door()
 	portal = PortalScript.new()
 	portal.height = 92.0
+	portal.face_left = true
 	portal.position = PORTAL_POS
 	portal.z_index = -1
 	add_child(portal)

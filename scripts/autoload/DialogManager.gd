@@ -471,3 +471,31 @@ func play_offer(offer: Variant, choices: Variant) -> String:
 	_freeze_player(false)
 	is_active = false
 	return String(picked.get("type", ""))
+
+## Satu ronde gerbang gema (K1-K8): pertanyaan, 4 pilihan diacak, Kirana mengucapkan pilihannya.
+## Kotak dialog dibiarkan terbuka; pemanggil menutupnya dengan close_echo().
+func play_echo_round(rnd: Dictionary) -> Dictionary:
+	if dialog_box == null:
+		return {}
+	is_active = true
+	_freeze_player(true)
+	await _show_one({"speaker": String(rnd.get("speaker", "adik")), "text": String(rnd.get("question", ""))})
+	var choices: Array = (rnd.get("choices", []) as Array).duplicate()
+	choices.shuffle()
+	var picked: Dictionary = choices[0] if not choices.is_empty() else {}
+	if is_bot():
+		var want := "jujur" if bot_choice_type == "jujur" else bot_choice_type
+		for c in choices:
+			if String(c.get("type", "")) == want:
+				picked = c
+	else:
+		dialog_box.prompt_simple_choices(choices)
+		picked = await dialog_box.choice_resolved
+	await _show_one({"speaker": "kakak", "text": String(picked.get("text", ""))})
+	return picked
+
+func close_echo() -> void:
+	if dialog_box:
+		dialog_box.close_dialog()
+	_freeze_player(false)
+	is_active = false

@@ -10,6 +10,9 @@ const TEX_PATH := "res://assets/processed/flow/portal.png"
 
 @export var height: float = 64.0
 @export var enterable: bool = false
+## Gambar portal punya arah (bukaan miring ke kanan). true = dibalik menghadap kiri,
+## dipakai untuk portal di sisi kanan layar yang dilewati Kirana ke arah kiri.
+@export var face_left: bool = false
 
 var sprite: Sprite2D
 var light: PointLight2D
@@ -23,6 +26,7 @@ func _ready() -> void:
 	sprite = Sprite2D.new()
 	sprite.texture = load(TEX_PATH) as Texture2D
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	sprite.flip_h = face_left
 	if sprite.texture:
 		var k := height / float(sprite.texture.get_height())
 		sprite.scale = Vector2(k, k)

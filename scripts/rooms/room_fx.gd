@@ -213,6 +213,8 @@ func _process(delta: float) -> void:
 
 func _layers_own_camera() -> bool:
 	# LayeredRoom (lapisan Parallax2D + kamera ikut pemain) sudah mengatur kamera dan parallax.
+	if room != null and "owns_camera" in room and bool(room.owns_camera):
+		return true
 	return room != null and "layers_active" in room and bool(room.layers_active)
 
 func _update_parallax(delta: float) -> void:

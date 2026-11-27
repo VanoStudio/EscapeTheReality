@@ -124,6 +124,12 @@ func _update_speaker(speaker_key: String, expression: String) -> void:
 					tex = ar.get_portrait("adik_biasa")
 			"penjual":
 				tex = ar.get_portrait("penjual")
+			"suara_adik", "adik_cermin":
+				tex = ar.get_portrait("adik_biasa")
+			"bayangan_adik":
+				# Sosok Adik yang berubah jadi bayangan hitam.
+				tex = ar.get_portrait("adik_biasa")
+				portrait_rect.material = shadow_material
 			"bayangan":
 				# Gunakan potret Kirana dengan shadow shader
 				tex = ar.get_portrait("kakak_biasa")
